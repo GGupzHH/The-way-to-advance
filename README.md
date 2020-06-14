@@ -13,7 +13,7 @@
     函数式编程就是用来描述数据(函数)之间的映射
   ```
 
-### &#x1F4DA; 函数是一等公民 MDN(First-Class Function)
+### &#x1F4DA; 函数是一等公民 MDN(First-Class Function) 高阶函数(Higher-order Function)
 - 特点
     - 函数可以存储在变量中 （函数表达式）
       ```js
@@ -36,5 +36,24 @@
           create: View.create
         }
       ```
-    - 函数可以作为参数
+    - 函数可以作为参数 传入
+      ```js
+        // forEach
+        function forEach(arr, fn) {
+          for (let i = 0; i < arr.length; i++) {
+            fn(arr[i], i)
+          }
+        }
+
+        // fliter
+        function filter(arr, fn) {
+          let result = []
+          for (let i = 0; i < arr.length; i++) {
+            if (fn(arr[i], i)) {
+              result.push(arr[i])
+            }
+          }
+          return result
+        }
+      ```
     - 函数可以作为返回值
