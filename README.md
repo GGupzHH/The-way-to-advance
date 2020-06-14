@@ -155,7 +155,7 @@
       我们可以把结果交给另一个函数处理
     ```
 
-### &#x1F4DA; Lodash[https://www.lodashjs.com]
+### &#x1F4DA; [Lodash](https://www.lodashjs.com)
   - lodash是什么
     ```txt
       是一个一致性、模块化、高性能的 JavaScript 实用工具库。
