@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+<script>
+// 利用闭包暂存次幂
+
+function makePower(power) {
+  return function(number) {
+    return Math.pow(number, power)
+  }
+}
+
+const makePower2 = makePower(2)
+const makePower3 = makePower(3)
+
+console.log(makePower2(3))
+
+// 可以在sources打断点观察函数的执行情况
+
+// 右侧
+  // Call Stack 当前的函数调用栈  anonymous 匿名函数
+  // scope 局部作用域
+  // Global 全局作用域  var 定义的变量是挂载到Global
+  // script let const  定义的变量是在script 作用域里面存储
+  // local 局部作用域 
+  // Closure 闭包 存储的是和闭包相关的变量  也就是上面函数中的power  makePower函数在执行之后就被销毁了  但是函数内部的变量被保存下来了 
+</script>
+</body>
+</html>
