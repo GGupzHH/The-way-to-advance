@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+<script>
+// 1. 不同级别的员工的底薪不同
+// 2. 不同员工的提成不同
+
+function makeSalary(base) {
+  return function(performance) {
+    return base + performance
+  }
+}
+
+// 不同级别的员工的底薪
+const salaryLeveI = makeSalary(11000)
+const salaryLeveII = makeSalary(13000)
+const salaryLeveIII = makeSalary(15000)
+
+// 不同员工的提成和最后的工资
+const zs = salaryLeveI(200)
+const ls = salaryLeveI(300)
+const ww = salaryLeveII(0)
+const wl = salaryLeveII(100)
+const wq = salaryLeveIII(0)
+const wb = salaryLeveIII(100)
+console.log(zs)
+console.log(ls)
+console.log(ww)
+console.log(wl)
+console.log(wq)
+console.log(wb)
+</script>
+</body>
+</html>
