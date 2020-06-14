@@ -36,7 +36,7 @@
           create: View.create
         }
       ```
-    - 函数可以作为参数 传入
+    - 函数可以作为参数 传入 (Part-01/model-01/higher-order-function.js)
       ```js
         // forEach
         function forEach(arr, fn) {
@@ -55,5 +55,7 @@
           }
           return result
         }
+        // 总结 函数作为参数传入的好处
+        //   1. 灵活 函数内部的执行条件/逻辑  是可以随着调用时改变的
       ```
     - 函数可以作为返回值
