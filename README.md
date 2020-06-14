@@ -124,8 +124,40 @@
       能让函数更灵活
       抽象可以帮助我们屏蔽细节， 只关注最后的结果
     ```
+
 ### &#x1F4DA; 闭包(Closure)
   - 定义 
     ```txt
     一个函数返回一个新的函数 并且返回的函数和当前词法作用域引用捆绑在一起形成闭包
+    ```
+  - 案例
+    ```js
+      // 利用闭包暂存次幂
+
+      function makePower(power) {
+        return function(number) {
+          return Math.pow(number, power)
+        }
+      }
+
+      const makePower2 = makePower(2)
+      const makePower3 = makePower(3)
+
+      console.log(makePower2(3))
+    ```
+
+### &#x1F4DA; 纯函数
+  - 概念
+    - 相同的输入永远会得到相同的输出，而且没有任何可观察的副作用
+    ```
+      类似数学中的函数(用来描述输入和输出的关系)
+      函数式编程中函数中的变量是无状态的
+      我们可以把结果交给另一个函数处理
+    ```
+
+### &#x1F4DA; Lodash[https://www.lodashjs.com]
+  - lodash是什么
+    ```txt
+      是一个一致性、模块化、高性能的 JavaScript 实用工具库。
+      提供了各种Array Object等一些封装好的方法
     ```
