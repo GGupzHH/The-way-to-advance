@@ -1,5 +1,5 @@
 const _ = require('lodash')
-
+// lodash 的 memoize 是记忆函数， 记忆函数的指定输入的输出
 
 function getArea(r) {
   console.log(r)
