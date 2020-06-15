@@ -155,9 +155,94 @@
       我们可以把结果交给另一个函数处理
     ```
 
-### &#x1F4DA; Lodash[https://www.lodashjs.com]
+### &#x1F4DA; [Lodash](https://www.lodashjs.com)
   - lodash是什么
     ```txt
       是一个一致性、模块化、高性能的 JavaScript 实用工具库。
       提供了各种Array Object等一些封装好的方法
     ```
+
+### &#x1F4DA; 纯函数
+  - 可缓存 
+    ```txt
+      因为纯函数相同的输入有相同的输出  所以可以把结果缓存下来 多次使用
+    ```
+    - lodash 的 memoize可以对纯函数实线缓存
+    ```js
+      const _ = require('lodash')
+
+      function getArea(r) {
+        console.log(r)
+        return Math.PI * r * r
+      }
+
+      let getAreaWithMemory = _.memoize(getArea)
+      console.log(getAreaWithMemory(4))
+      console.log(getAreaWithMemory(4))
+      console.log(getAreaWithMemory(4))
+      console.log(getAreaWithMemory(5))
+      console.log(getAreaWithMemory(5))
+    ```
+    - 自己实现一个memoize
+      ```js
+        function memoize(f) {
+          let cache = {}
+          return function() {
+            let key = JSON.stringify(arguments)
+            cache[key] = cache[key] || f.apply(f, arguments)
+            return cache[key]
+          }
+        }
+
+        let getAreaWithMemory = memoize(getArea)
+        console.log(getAreaWithMemory(4))
+        console.log(getAreaWithMemory(4))
+        console.log(getAreaWithMemory(4))
+        console.log(getAreaWithMemory(5))
+        console.log(getAreaWithMemory(5))
+      ```
+  - 便于测试
+    ```txt
+     所有的纯函数在相同的输入会有相同的输出
+    ```
+  - 并行处理
+    ```txt
+      多线程操作全局变量时候，可能会造成共享变量被修改
+      而纯函数不需要访问共享的内存数据，所以纯函数可以在并行环境下任意运行( webwork )
+    ```
+  - 副作用
+    ```js
+      // 不纯函数  因为函数输出的结果会和外部定义的mini变量有关系
+      let mini = 18
+      function checkAge(age) {
+        return age > mini
+      }
+
+      // 纯函数(有硬编码 后续可以通过柯里化解决)
+      function checkAge(age) {
+        let mini = 18
+        return age > mini
+      }
+    ```
+    - 副作用来源
+      ```txt
+        配置文件...
+      ```
+### &#x1F4DA; 柯里化(Haskell Brooks Curry)
+  - 定义
+    ```txt
+      当一个函数需要多个参数的时候， 我们可以调用一个函数只传入部分的参数(这部分参数以后永远不会变)，这个函数返回一个新的函数， 这个新的函数去接收剩余的参数， 并返回最终结果 
+    ```
+  - _.curry(func) lodash 中的函数通用柯里化方法
+    - 功能
+      ```txt
+        创建一个函数，该函数接收一个或多个func的参数， 如果func所需要的参数都被传入， 则执行func返回结果。否则继续返回该函数并等待接收剩余参数
+      ```
+    - 参数
+      ```txt
+        需要柯里化的函数
+      ```
+    - 返回值
+      ```txt
+        柯里化后的函数
+      ```
