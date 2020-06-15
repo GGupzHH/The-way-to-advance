@@ -161,3 +161,70 @@
       是一个一致性、模块化、高性能的 JavaScript 实用工具库。
       提供了各种Array Object等一些封装好的方法
     ```
+
+### &#x1F4DA; 纯函数
+  - 可缓存 
+    ```txt
+      因为纯函数相同的输入有相同的输出  所以可以把结果缓存下来 多次使用
+    ```
+    - lodash 的 memoize可以对纯函数实线缓存
+    ```js
+      const _ = require('lodash')
+
+      function getArea(r) {
+        console.log(r)
+        return Math.PI * r * r
+      }
+
+      let getAreaWithMemory = _.memoize(getArea)
+      console.log(getAreaWithMemory(4))
+      console.log(getAreaWithMemory(4))
+      console.log(getAreaWithMemory(4))
+      console.log(getAreaWithMemory(5))
+      console.log(getAreaWithMemory(5))
+    ```
+    - 自己实现一个memoize
+      ```js
+        function memoize(f) {
+          let cache = {}
+          return function() {
+            let key = JSON.stringify(arguments)
+            cache[key] = cache[key] || f.apply(f, arguments)
+            return cache[key]
+          }
+        }
+
+        let getAreaWithMemory = memoize(getArea)
+        console.log(getAreaWithMemory(4))
+        console.log(getAreaWithMemory(4))
+        console.log(getAreaWithMemory(4))
+        console.log(getAreaWithMemory(5))
+        console.log(getAreaWithMemory(5))
+      ```
+  - 便于测试
+    ```txt
+     所有的纯函数在相同的输入会有相同的输出
+    ```
+  - 并行处理
+    ```txt
+      多线程操作全局变量时候，可能会造成共享变量被修改
+      而纯函数不需要访问共享的内存数据，所以纯函数可以在并行环境下任意运行( webwork )
+    ```
+  - 副作用
+    ```js
+      // 不纯函数  因为函数输出的结果会和外部定义的mini变量有关系
+      let mini = 18
+      function checkAge(age) {
+        return age > mini
+      }
+
+      // 纯函数(有硬编码 后续可以通过柯里化解决)
+      function checkAge(age) {
+        let mini = 18
+        return age > mini
+      }
+    ```
+    - 副作用来源
+      ```txt
+        配置文件...
+      ```
