@@ -42,23 +42,26 @@ class MyPromise{
   }
 
   then(onFulfilledCallback, onRejectedCallback) {
-    try {
-      // 想要链式调用 就需要在then方法返回一个新的myPromise
-      return new MyPromise((resolve, reject) => {
-        if(this.state === this.fulfilled) {
-          // 先执行成功的回调  然后将回调的返回值传入下一个myPromise的resolve中
-          resolve(onFulfilledCallback(this.value))
-        } else if (this.state === this.rejected) {
-          // 失败的回调
-          reject(onRejectedCallback(this.reason))
-        } else {
-          this.onFulfilledCallback.push(onFulfilledCallback)
-          this.onRejectedCallback.push(onRejectedCallback)
-        }
-      })
-    } catch (error) {
-      onRejectedCallback(err.message)
-    }
+    // 想要链式调用 就需要在then方法返回一个新的myPromise
+    let promise2 = new MyPromise((resolve, reject) => {
+      if(this.state === this.fulfilled) {
+        setTimeout(() => {
+          try {
+            // 先执行成功的回调  然后将回调的返回值传入下一个myPromise的resolve中
+            resolve(onFulfilledCallback(this.value))
+          } catch (error) {
+            reject(error)
+          }
+        }, 0);
+      } else if (this.state === this.rejected) {
+        // 失败的回调
+        reject(onRejectedCallback(this.reason))
+      } else {
+        this.onFulfilledCallback.push(onFulfilledCallback)
+        this.onRejectedCallback.push(onRejectedCallback)
+      }
+    })
+    return promise2
   }
   // 可以判断传入的函数是否符合规范  这里先不写
   isNothing(fn) {
@@ -78,12 +81,12 @@ const myPromise = new MyPromise(function(resolve, reject) {
 })
 
 myPromise.then(v => {
-  console.log(1)
-  return asd
+  console.log(123)
+  return 12
 }, err => {
   console.log(err, 1)
 }).then(v => {
-  console.log(v)
+  console.log(v + 12)
 }, err => {
   console.log(err, 2)
 })
