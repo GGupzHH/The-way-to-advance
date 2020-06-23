@@ -17,7 +17,11 @@ class MyPromise{
   onRejectedCallback = []
 
   constructor(executor) {
-    executor(this.resolve, this.reject)
+    try {
+      executor(this.resolve, this.reject)
+    } catch (error) {
+      this.reject(error.message)
+    }
   }
   // 成功时候的回调
   resolve = value => {
@@ -38,19 +42,23 @@ class MyPromise{
   }
 
   then(onFulfilledCallback, onRejectedCallback) {
-    // 想要链式调用 就需要在then方法返回一个新的myPromise
-    return new MyPromise((resolve, reject) => {
-      if(this.state === this.fulfilled) {
-        // 先执行成功的回调  然后将回调的返回值传入下一个myPromise的resolve中
-        resolve(onFulfilledCallback(this.value))
-      } else if (this.state === this.rejected) {
-        // 失败的回调
-        reject(onRejectedCallback(this.reason))
-      } else {
-        this.onFulfilledCallback.push(onFulfilledCallback)
-        this.onRejectedCallback.push(onRejectedCallback)
-      }
-    })
+    try {
+      // 想要链式调用 就需要在then方法返回一个新的myPromise
+      return new MyPromise((resolve, reject) => {
+        if(this.state === this.fulfilled) {
+          // 先执行成功的回调  然后将回调的返回值传入下一个myPromise的resolve中
+          resolve(onFulfilledCallback(this.value))
+        } else if (this.state === this.rejected) {
+          // 失败的回调
+          reject(onRejectedCallback(this.reason))
+        } else {
+          this.onFulfilledCallback.push(onFulfilledCallback)
+          this.onRejectedCallback.push(onRejectedCallback)
+        }
+      })
+    } catch (error) {
+      onRejectedCallback(err.message)
+    }
   }
   // 可以判断传入的函数是否符合规范  这里先不写
   isNothing(fn) {
@@ -63,6 +71,7 @@ const myPromise = new MyPromise(function(resolve, reject) {
   // 使其状态变成成功
   // setTimeout(() => {
     resolve('成功')
+    // console.log(asd)
   // }, 4000);
   // 使其状态变成失败
   // reject('失败')
@@ -70,11 +79,11 @@ const myPromise = new MyPromise(function(resolve, reject) {
 
 myPromise.then(v => {
   console.log(1)
-  return 12
+  return asd
 }, err => {
-  console.log(err)
+  console.log(err, 1)
 }).then(v => {
   console.log(v)
-}).then(v => {
-  console.log(v)
+}, err => {
+  console.log(err, 2)
 })
