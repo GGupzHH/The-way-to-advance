@@ -26,6 +26,7 @@ class MyPromise{
   // 成功时候的回调
   resolve = value => {
     if(this.state === this.penging) {
+      // 改变状态
       this.state = this.fulfilled
       this.value = value
       // 判断成功回调是否存在  存在则执行
@@ -97,20 +98,25 @@ class MyPromise{
   }
 
   catch(onRejectedCallback) {
+    // 捕获所有的异常 并返回
     return this.then(undefined, onRejectedCallback)
   }
 
   // 静态方法只能class直接去调用 class的实例对象并不能调用
   static resolve(value) {
+    // 判断是否是MyPromise的实例成员
     if (value instanceof MyPromise) return value;
+    // 如果是普通值 则需要包装一下返回 确保返回的是MyPromise实例
     return new MyPromise(resolve => resolve(value));
   }
 
   static all(array) {
+    // 定义一个返回的数组
     let result = []
+    // 定义一个"计数器" 去计算成功返回的次数 
     let i = 0
-    
     return new MyPromise((resolve, reject) => {
+      // 将成功的回调结果放入数组中
       function addData(index, value) {
         result[index] = value
         i++
@@ -119,8 +125,12 @@ class MyPromise{
         }
       }
       for (let i = 0; i < array.length; i++) {
+        // 拿到当前项
         let current = array[i]
         if (array[i] instanceof MyPromise) {
+          // 如果是MyPromise实例则直接调用他本身的resolve方法 
+          // 成功时将成功的值传入addData并记录
+          // 失败时直接返回当前MyPromise的reject 并将错误信息传入
           current.then(value => addData(i, value), reason => reject(reason))
         } else {
           addData(i, current)
