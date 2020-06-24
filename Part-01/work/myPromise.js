@@ -58,7 +58,7 @@ class MyPromise{
           } catch (error) {
             reject(error)
           }
-        }, 0);
+        }, 0)
       } else if (this.state === this.rejected) {
         setTimeout(() => {
           try {
@@ -68,7 +68,7 @@ class MyPromise{
           } catch (error) {
             reject(error)
           }
-        }, 0);
+        }, 0)
       } else {
         this.successCallback.push(() => {
           setTimeout(() => {
@@ -79,7 +79,7 @@ class MyPromise{
             } catch (error) {
               reject(error)
             }
-          }, 0);
+          }, 0)
         })
         this.failCallback.push(() => {
           setTimeout(() => {
@@ -105,9 +105,14 @@ class MyPromise{
   // 静态方法只能class直接去调用 class的实例对象并不能调用
   static resolve(value) {
     // 判断是否是MyPromise的实例成员
-    if (value instanceof MyPromise) return value;
+    if (value instanceof MyPromise) return value
     // 如果是普通值 则需要包装一下返回 确保返回的是MyPromise实例
-    return new MyPromise(resolve => resolve(value));
+    return new MyPromise(resolve => resolve(value))
+  }
+
+  static reject(value) {
+    if (value instanceof MyPromise) return value
+    return new MyPromise((resolve, reject) => reject(value))
   }
 
   static all(array) {
