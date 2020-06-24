@@ -95,13 +95,39 @@ class MyPromise{
     })
     return promise2
   }
+
+  catch(onRejectedCallback) {
+    return this.then(undefined, onRejectedCallback)
+  }
+
   // 静态方法只能class直接去调用 class的实例对象并不能调用
-  static resolve (value) {
+  static resolve(value) {
     if (value instanceof MyPromise) return value;
     return new MyPromise(resolve => resolve(value));
   }
 
-  
+  static all(array) {
+    let result = []
+    let i = 0
+    
+    return new MyPromise((resolve, reject) => {
+      function addData(index, value) {
+        result[index] = value
+        i++
+        if (i === array.length) {
+          resolve(result)
+        }
+      }
+      for (let i = 0; i < array.length; i++) {
+        let current = array[i]
+        if (array[i] instanceof MyPromise) {
+          current.then(value => addData(i, value), reason => reject(reason))
+        } else {
+          addData(i, current)
+        }
+      }
+    })
+  }
 }
 
 function resolvePromise(promise2, x, resolve, reject) {
