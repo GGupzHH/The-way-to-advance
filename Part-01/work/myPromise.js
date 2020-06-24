@@ -12,15 +12,15 @@ class MyPromise{
   // 失败的结果
   reason = undefined
   // 成功的回调
-  onFulfilledCallback = []
+  successCallback = []
   // 失败的回调
-  onRejectedCallback = []
+  failCallback  = []
 
   constructor(executor) {
     try {
       executor(this.resolve, this.reject)
     } catch (error) {
-      this.reject(error.message)
+      this.reject(error)
     }
   }
   // 成功时候的回调
@@ -29,7 +29,7 @@ class MyPromise{
       this.state = this.fulfilled
       this.value = value
       // 判断成功回调是否存在  存在则执行
-      while(this.onFulfilledCallback.length) this.onFulfilledCallback.shift()(this.value)
+      while(this.successCallback.length) this.successCallback.shift()()
     }
   }
   // 失败时候的回调
@@ -37,63 +37,74 @@ class MyPromise{
     if (this.state === this.penging) {
       this.state = this.rejected
       this.reason = reason
-      while(this.onRejectedCallback.length) this.onRejectedCallback.shift()(this.reason)
+      while(this.failCallback.length) this.failCallback.shift()()
     }
   }
 
   then(onFulfilledCallback, onRejectedCallback) {
+    // 参数可选
+    onFulfilledCallback = onFulfilledCallback ? onFulfilledCallback : value => value
+    onRejectedCallback = onRejectedCallback ? onRejectedCallback : reason => { throw reason }
     // 想要链式调用 就需要在then方法返回一个新的myPromise
     let promise2 = new MyPromise((resolve, reject) => {
+      // 判断状态
       if(this.state === this.fulfilled) {
         setTimeout(() => {
           try {
+            let result = onFulfilledCallback(this.value)
             // 先执行成功的回调  然后将回调的返回值传入下一个myPromise的resolve中
-            resolve(onFulfilledCallback(this.value))
+            resolvePromise(promise2, result, resolve, reject)
           } catch (error) {
-            reject(error.message)
+            reject(error)
           }
         }, 0);
       } else if (this.state === this.rejected) {
         setTimeout(() => {
           try {
             // 失败的回调
-            reject(onRejectedCallback(this.reason))
+            let result = onRejectedCallback(this.reason)
+            resolvePromise(promise2, result, resolve, reject)
           } catch (error) {
-            reject(error.message)
+            reject(error)
           }
         }, 0);
-        
       } else {
-        this.onFulfilledCallback.push(onFulfilledCallback)
-        this.onRejectedCallback.push(onRejectedCallback)
+        this.successCallback.push(() => {
+          setTimeout(() => {
+            try {
+              let result = onFulfilledCallback(this.value)
+              // 先执行成功的回调  然后将回调的返回值传入下一个myPromise的resolve中
+              resolvePromise(promise2, result, resolve, reject)
+            } catch (error) {
+              reject(error)
+            }
+          }, 0);
+        })
+        this.failCallback.push(() => {
+          setTimeout(() => {
+            try {
+              // 失败的回调
+              let result = onRejectedCallback(this.reason)
+              resolvePromise(promise2, result, resolve, reject)
+            } catch (error) {
+              reject(error)
+            }
+          }, 0)
+        })
       }
     })
     return promise2
   }
-  // 可以判断传入的函数是否符合规范  这里先不写
-  isNothing(fn) {
-
-  }
 }
 
-
-const myPromise = new MyPromise(function(resolve, reject) {
-  // 使其状态变成成功
-  // setTimeout(() => {
-    resolve('你好')
-    // console.log(asd)
-  // }, 4000);
-  // 使其状态变成失败
-  // reject('失败')
-})
-
-myPromise.then(v => {
-  console.log(v, 123)
-  return das
-}, err => {
-  console.log(err, 1)
-}).then(v => {
-  console.log(v + 12)
-}, err => {
-  console.log(err, 2)
-})
+function resolvePromise(promise2, x, resolve, reject) {
+  if(promise2 === x) {
+    return reject(new TypeError('Chaining cycle detected for promise #<Promise>'))
+  }
+  // 判断返回值类型 promise去调用.then  普通值直接返回
+  if (x instanceof MyPromise) {
+    x.then(resolve, reject)
+  } else {
+    resolve(x)
+  }
+}
