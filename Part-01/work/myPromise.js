@@ -50,12 +50,19 @@ class MyPromise{
             // 先执行成功的回调  然后将回调的返回值传入下一个myPromise的resolve中
             resolve(onFulfilledCallback(this.value))
           } catch (error) {
-            reject(error)
+            reject(error.message)
           }
         }, 0);
       } else if (this.state === this.rejected) {
-        // 失败的回调
-        reject(onRejectedCallback(this.reason))
+        setTimeout(() => {
+          try {
+            // 失败的回调
+            reject(onRejectedCallback(this.reason))
+          } catch (error) {
+            reject(error.message)
+          }
+        }, 0);
+        
       } else {
         this.onFulfilledCallback.push(onFulfilledCallback)
         this.onRejectedCallback.push(onRejectedCallback)
@@ -73,7 +80,7 @@ class MyPromise{
 const myPromise = new MyPromise(function(resolve, reject) {
   // 使其状态变成成功
   // setTimeout(() => {
-    resolve('成功')
+    resolve('你好')
     // console.log(asd)
   // }, 4000);
   // 使其状态变成失败
@@ -81,8 +88,8 @@ const myPromise = new MyPromise(function(resolve, reject) {
 })
 
 myPromise.then(v => {
-  console.log(123)
-  return 12
+  console.log(v, 123)
+  return das
 }, err => {
   console.log(err, 1)
 }).then(v => {
