@@ -95,6 +95,13 @@ class MyPromise{
     })
     return promise2
   }
+  // 静态方法只能class直接去调用 class的实例对象并不能调用
+  static resolve (value) {
+    if (value instanceof MyPromise) return value;
+    return new MyPromise(resolve => resolve(value));
+  }
+
+  
 }
 
 function resolvePromise(promise2, x, resolve, reject) {
