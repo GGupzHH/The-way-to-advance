@@ -1,6 +1,6 @@
-# &#x1F39F; Part-1 JavaScript 深度剖析
+# &#x1F39F; Part-01 JavaScript 深度剖析
 
-## &#x1F6A9; model -1 函数式编程与JS异步编程、手写Promise
+## &#x1F6A9; model-01 函数式编程与JS异步编程、手写Promise
 
 ### &#x1F4DA; 函数式编程 (Function Programming FP)
 
@@ -228,6 +228,7 @@
       ```txt
         配置文件...
       ```
+
 ### &#x1F4DA; 柯里化(Haskell Brooks Curry)
   - 定义
     ```txt
@@ -251,3 +252,4 @@
     - 这是一种对函数参数的'缓存(闭包)'
     - 让函数更灵活， 粒度更小
     - 可以把多元函数(多个参数)转换为一元函数(一个参数)， 组合使用产生强大的功能
+
