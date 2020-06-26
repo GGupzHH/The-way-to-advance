@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+<script src="./myPromise.js"></script>
+<script>
+
+const myPromise = new MyPromise(function(resolve, reject) {
+  // 使其状态变成成功
+  // setTimeout(() => {
+    resolve('你好')
+    // console.log(asd)
+  // }, 4000);
+  // 使其状态变成失败
+  // reject('失败')
+})
+
+myPromise.then(v => {
+  console.log(v, 123)
+  return das
+}, err => {
+  console.log(err, 1)
+}).then(v => {
+  console.log(v + 12)
+}, err => {
+  console.log(err, 12321321321)
+})
+
+</script>
+</body>
+</html>
