@@ -531,10 +531,19 @@
     }
 
     let result = new Proxy(person, {
+      /**
+        target: 当前监听的对象
+        name: 要获取的属性名
+      */
       get(target, name) {
         console.log(target, name)
         return name in target ? target[name] : undefined
       },
+      /**
+        target: 当前监听的对象
+        key: 要设置的新属性名
+        value: 要设置的属性值
+      */
       set(target, key, value) {
         // 这里可以在添加值的时候 加入一些自己的逻辑  如果值不是指定类型的   可以使用throw new Error('抛出异常')抛出异常
         console.log(target, key, value)
@@ -542,4 +551,99 @@
       }
     })
     console.log(result.name)
+  ```
+
+### &#x1F4DA; ES2015 Proxy对比defineProperty
+  ![Image text](./image/image-01.jpg)
+  - defineProperty 不能监听到对象属性的删除 和 一些方法的调用
+    ```js
+      
+      let person = {
+        name: 'zs',
+        age: 12
+      }
+
+      let result = new Proxy(person, {
+        /**
+          target: 当前监听的对象
+          property: 要删除的属性名
+        */
+        deleteProperty(target, property) {
+          console.log(target, property)
+          delete target[property]
+        }
+      })
+
+      delete result.name
+      console.log(person)
+    ```
+  - 更好的支持数组对象的监视
+    ```js
+    let arr = []
+    let result = new Proxy(arr, {
+      set(target, key, value) {
+        console.log(target, key, value)
+        target[key] = value
+        // 设置成功返回true
+        return true
+      }
+    })
+    // 类似push的方法都可以监听到
+    result.push(1)
+    console.log(arr)
+    ```
+  - 是以非侵入的方式监管了对象的读写
+    ```js
+      // 已经定义好的对象 我们不需要再添加额外的操作去监测
+    ```
+### &#x1F4DA; ES2015 Reflect 静态类 提供了13个静态方法
+  ```js
+    // Reflect成员方法就是Proxy处理对象的默认实现
+    // 提供了一套用于操作对象的API
+    // 例如
+    let obj = {
+      name: 'zhh'
+    }
+
+    // 如果这里我们什么都不写  那内部默认执行的是什么呢  也就是这里的默认实现是通过Reflect实现的
+    let result = new Proxy(obj, {})
+
+    console.log('name' in obj)
+    console.log(delete obj['name'])
+    console.log(Object.keys(obj))
+
+    console.log(Reflect.has(obj, 'name'))
+    console.log(Reflect.deleteProperty(obj, 'name'))
+    console.log(Reflect.ownKeys(obj))
+  ```
+
+### &#x1F4DA; ES2015 Promise
+  ```js
+    // 更优的异步解决方案
+    // 避免回调地狱
+  ```
+
+### &#x1F4DA; ES2015 Class
+  ```js
+    function Person(name) {
+      this.name = name
+    }
+
+    Person.prototype.say = function() {
+      console.log(this.name)
+    }
+    
+    let person = new Person('zs')
+
+    class Person {
+      constructor(name) {
+        this.name = name
+      }
+
+      say() {
+        console.log(this.name)
+      }
+    }
+
+    let person = new Person('ls')
   ```
