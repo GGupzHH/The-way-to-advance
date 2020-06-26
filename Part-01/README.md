@@ -255,3 +255,265 @@
 
 
 ## &#x1F6A9; model-02 ES 新特性与 TypeScript、JS 性能优化
+
+### &#x1F4DA; ECMAScript 概述
+  ```txt
+    只提供了基本的语法
+    JavaScript实现了ECMAScript的标准, 在这个基础之上实现了一些扩展。
+
+    浏览器环境 
+    ECMAScript + BOM + DOM
+
+    node 环境
+    ECMAScript + fs + net + etc.
+  ```
+
+### &#x1F4DA; ECMAScript2015   -> ES6
+  1. 解决原有语法上的一些问题或者不足
+  2. 对原有语法的增强
+  3. 全新的对象、全新的方法、功能
+  4. 全新的数据类型和数据结构
+   
+### &#x1F4DA; let 关键字
+  ```js
+    // 1. 首先let 存在暂时性死区  也就是无法在定义之前获取
+    console.log(i)
+    let i = 0;
+
+    // 2. 块级作用域 {}
+    // 只在当前的花括号之内起作用
+  ```
+
+### &#x1F4DA; const 关键字
+  ```js
+    // 只读  不能修改存储的内存的地址
+    // 其他的和let相同
+  ```
+
+### &#x1F4DA; 数组解构 根据下表提取
+  ```js
+    // 解构最后一个
+    let arr = [1, 2, 3]
+    cosnt [, , foo] = arr
+    console.log(foo) // 3
+
+    // 解构剩余
+    const [foo, ...rest] = arr
+    console.log(foo) // 1
+    console.log(rest) // [2, 3]
+
+    // 解构第一个
+    let arr = [1, 2, 3]
+    cosnt [foo] = arr
+    console.log(foo) // 1
+
+    // 解构不存在的 
+    let arr = [1, 2, 3]
+    cosnt [foo, bar, baz, more] = arr
+    console.log(more) // undefined
+
+    // 设置默认值  如果解构没有获取到值  则使用默认值
+    let arr = [1, 2, 3]
+    cosnt [foo, bar, baz, more = 'default'] = arr
+    console.log(more) // default
+  ```
+
+### &#x1F4DA; 对象解构  根据属性名提取
+  ```js
+    let obj = { name: 'zs', age: '12' }
+    let { name } = obj
+    console.log(name) // 'zs'
+
+    //  重命名
+    let { name: newName } = obj
+  ```
+
+### &#x1F4DA; 模板字符串
+  ```js
+    let a = `hello world`
+
+    // 1. 支持换行  多行
+    // 2. 插值表达式
+    // 3. 可以计算
+    let name = 'ECMAScript'
+    let b = `hello world${name}`
+    console.log(b) // hello worldECMAScript
+
+    let b = `hello world${1 + 2}`
+    console.log(b) // hello world3
+  ```
+
+### &#x1F4DA; 模板字符串 标签
+  ```js
+    //  myTagName是一个标签函数  就是一个普通函数
+    let name = 'Tom' 
+    let age = 12
+    function myTagName(strings, name, age) {
+      // strings是使用插值表达式分割的字符串数组 ['hello ', ', ', '']
+      // name 是插值表达式传入的值
+      // age同上
+      console.log(strings, name, age)
+      // 这个函数的返回值直接就是模板字符串的返回值
+      // 如果返回123  则下面的result就是123
+      // return 123
+
+      // 所以我们可以在这里面处理模板字符串 
+      // 比如可以在这里处理数字 将传入的数字在业务中是钱， 那么就可以在这里处理千分符  而且不会污染原来数字
+
+      // 下面是正常返回
+      return strings[0] + name + strings[1] + age + strings[2]
+    }
+
+    let result = myTagName`hello ${name}, ${age}`
+    console.log(result)
+  ```
+
+### &#x1F4DA; ES2015 字符串扩展方法 
+  ```js
+    // 判断字符串中是否存在指定的字符串
+    // includes()
+    let str = 'hello world'
+    console.log(str.includes('o w')) // true
+
+    // 下面两个方法  一个是判断字符串是否以指定字符开头  后面的是判断结尾的
+    // startsWith()
+    // endsWith()
+
+    let str = 'hello world'
+    console.log(str.startsWith('h')) // true
+  ```
+
+### &#x1F4DA; ES2015 参数默认值
+  ```js
+    // 在定义函数时候， 指定形参的默认值， 当实参没有传入或者传入为undefined时， 此时使用默认值
+    // 注意： 有默认值的形参一定要放到最后
+    function foo(str, bar = 1) {
+      console.log(bar)
+    }
+  ```
+
+### &#x1F4DA; ES2015 剩余参数
+  ```js
+    // 会接收当前函数传入的所有实参  并且存放在一数组当中 
+    function foo(...arg) {
+      console.log(bar) // [1, 2, 3]
+    }
+    foo(1, 2, 3)
+
+    // 获取name除外的所有剩下的参数 只能使用一次
+    function foo(name, ...arg) {
+      console.log(name, arg) // Tom  [12, 170]
+    }
+
+    foo('Tom', 12, 170)
+  ```
+
+### &#x1F4DA; ES2015 数组展开
+  ```js
+    let a = ['Tom', 12, 170]
+    // 打印每一项
+    function consoleLog(i) {
+      console.log(i)
+    }
+    // 将数组展开然后将数组的每一项当做一个实参传入
+    consoleLog(...a)
+  ```
+
+### &#x1F4DA; ES2015 箭头函数
+  ```js
+    function inc(n) {
+      console.log(n)
+    }
+
+    let inc = n => console.log(n)
+  ```
+
+### &#x1F4DA; ES2015 箭头函数 this
+  ```js
+  // 箭头函数没有this的机制  箭头函数内部的this 取决于箭头函数定义的位置
+    let person = {
+      name: 'Tom',
+      sayHi: () => console.log(this.name + 1),
+      sayHis: function() {
+        console.log(this.name)
+      }
+    }
+    person.sayHi()
+    person.sayHis()
+
+    // 可以解决settimeout 这种全局调用的的回调中this指向的问题 
+    person.saiHiAsync = function() {
+      setTimeout(function() {
+        console.log(this.name)
+      })
+    }
+
+    person.saiHiAsyncs = function() {
+      setTimeout(() => {
+        console.log(this.name)
+      })
+    }
+    person.saiHiAsync()
+    // 因为箭头函数内部没有this  他的this取决于箭头函数定义的位置  当前箭头函数定义的位置的作用域内部this指向person
+    person.saiHiAsyncs()
+  ```
+
+### &#x1F4DA; ES2015 对象字面量增强
+  ```js
+    // 1. 当属性名和对应的值 的名字一样时, 对象定义属性名可以直接写
+    // 2. 当属性名和要声明的方法名相同时, 同上
+    // 3. 计算属性名: 声明对象的时候属性名采用动态的值去定义， 原本的js是不支持动态属性名的，只能在对象声明之后使用[] 去定义动态的属性名
+    let name = 'zs'
+
+    let people = {
+      // name: name,
+      name,
+      age: 12,
+      // getAge: function () {
+      //   console.log(this.age)
+      // },
+      getAge() {
+        console.log(this.age)
+      },
+      // 下面的做法是错误的随机属性名定义  之前如果想使用随机定义属性名需要在当前对象声明之后使用[]定义
+      // Math.random(): '1'
+      // 现在ES6 可以直接使用[]定义随机属性名
+      [Math.random()]: '1',
+      [1 + 1]: 2
+    }
+    people[Math.random()] = '1'
+    console.log(people)
+  ```
+
+### &#x1F4DA; ES2015 对象扩展方法
+  - Object.assign
+    ```js
+      // 将指定对象合并到目标对象中 接受多个参数, 合并到第一个参数对象中 
+      let source1 = {
+        a: 1,
+        b: 2
+      }
+      let source2 = {
+        a: 11,
+        c: 3,
+        h: {
+          a: 11
+        }
+      }
+      let source3 = {
+        b: 22,
+        d: 4
+      }
+      let target = {
+        a: 0,
+        b: 0
+      }
+
+      let result = Object.assign(target, source1, source2, source3)
+      console.log(result)
+      // ！！！！！ 不支持深拷贝
+    ```
+  - Object.is
+    ```js
+      
+    ```
