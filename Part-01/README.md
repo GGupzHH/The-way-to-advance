@@ -515,5 +515,31 @@
     ```
   - Object.is
     ```js
-      
+      // 判断两个值是否相等
+      // 和 === 区别  ===判断 +0 -0时 返回true     NaN === NaN 返回false 
+
+      Object.is(+0, -0)
+      Object.is(NaN, NaN)
     ```
+
+### &#x1F4DA; ES2015 Proxy
+  ```js
+    // proxy 监听对象  (代理)
+    let person = {
+      name: 'zs',
+      age: 12
+    }
+
+    let result = new Proxy(person, {
+      get(target, name) {
+        console.log(target, name)
+        return name in target ? target[name] : undefined
+      },
+      set(target, key, value) {
+        // 这里可以在添加值的时候 加入一些自己的逻辑  如果值不是指定类型的   可以使用throw new Error('抛出异常')抛出异常
+        console.log(target, key, value)
+        target[key] = value
+      }
+    })
+    console.log(result.name)
+  ```
