@@ -647,3 +647,315 @@
 
     let person = new Person('ls')
   ```
+
+### &#x1F4DA; ES2015 Class 实例方法  静态方法
+  ```js
+    // 实例方法需要这个类型构造的实例对象去调用
+    // 静态方法直接通过类型本身调用
+
+    // 专门添加静态方法的关键词 static 
+    class Person {
+      constructor(name) {
+        this.name = name
+      }
+
+      say() {
+        console.log(this.name)
+      }
+
+      static sayHi() {
+        return new Person()
+      }
+    }
+    // this不是指向实例对象的  而是指向当前类型
+  ```
+
+### &#x1F4DA; ES2015 Class 继承extends
+  ```js
+    // 继承会继承父类所有的方法和属性  包括静态方法
+    class Person {
+      constructor(name) {
+        this.name = name
+      }
+
+      say() {
+        console.log(this.name)
+      }
+
+      static sayHi() {
+        return new Person()
+      }
+    }
+
+    class Student extends Person{
+      constructor(name, age) {
+        super(name)
+        this.age = age
+      }
+
+      hello() {
+        super.say()
+        console.log(this.age)
+      }
+    }
+  ```
+
+### &#x1F4DA; ES2015 Set
+  ```js
+    // Set 是一个集合 其内部不能存放重复的数据  重复添加会失效 
+    // 介绍用法 
+    let set = new Set()
+    // 因为add方法返回当前set对象  所以可以链式调用
+    set.add(1).add(2).add(3).add(2) // Set(3) { 1, 2, 3 }
+
+    // 遍历
+    set.forEach( i => console.log(i) )   // 这里也可以用for of去遍历哦
+
+    // 获取长度
+    set.size()
+
+    // 判断是否存在某元素
+    set.has(100)
+    set.has(1)
+
+    // 删除指定元素
+    set.delete(2)
+
+    // 清空set
+    set.clear()
+
+    // 主要作用是数组去重
+    let arr = [1, 2, 3, 1, 2, 4]
+
+    let result1 = Array.from(new Set(arr))
+    let result2 = [...new Set(arr)]
+    console.log(result1)
+    console.log(result2)
+  ```
+
+### &#x1F4DA; ES2015 Map 数据结构
+  ```js
+    // js对象 存储的key 不管是什么类型 最后都会转换为string类型 
+    let obj = {}
+    obj[1] = 1
+    obj[true] = 2
+    obj[{ a: 1 }] = 3
+    console.log(obj)
+
+    let m = new Map()
+
+    const tom = { name: 'Tom' }
+
+    m.set(tom, 100)
+
+    console.log(m)
+
+    console.log(m.get(tom))
+
+    m.has()
+    m.delete()
+    m.clear()
+
+
+    // 遍历
+    m.forEach((value, key) => {
+      console.log(value, key)
+    })
+  ```
+
+### &#x1F4DA; ES2015 Symbol
+  ```js
+    // 唯一性  只要调用就是全新的值
+
+    // symbol 独一无二的值  是一种新的数据结构
+    // 主要可以为对象添加独一无二的属性名
+    let a = Symbol()
+    let b = Symbol()
+    // symbol 创建的值永远不可能相同
+    // 这样就可以给对象创建唯一属性名的值了 也就是可以创建一些不想让外部修改的属性值了  私有成员
+    // 这里我们使用计算属性名的方法创建
+    const name = Symbol()
+    let obj = {
+      [name]: 1,
+      getValue() {
+        console.log(this[name])
+      }
+    }
+
+    // 如果想让symbol相同可以使用symbol的for方法
+    const s1 = Symbol.for('foo')
+    const s2 = Symbol.for('foo')
+    s1 === s1  // true
+
+    // 因为传入的foo这个值都是会转换为字符串的  所以需要注意一切隐式类型转换
+
+    // symbol有一些私有的属性   这些属性是为给symbol内部一些方法命名的
+    console.log(Symbol.iterator)
+    console.log(Symbol.hasInstance)
+
+    // 而且可以修改toString的结果
+    const obj = {
+      [Symbol.toStringTag]: 'XObject' 
+    }
+    console.log(obj.toString())
+
+    // 使用Symbol创建的属性名无法被for of 遍历到  使用Object.keys()也无法获取的
+
+    // 但是可以使用Object.getOwnPropertySymbol(obj)获取
+  ```
+
+### &#x1F4DA; ES2015 for of
+  ![Image text](./image/image-02.jpg)
+  ```js
+    // for 遍历数组
+    // for in 遍历键值对
+    
+    // 上面都会存在一些局限性
+    // for of 
+    // 可以遍历数组 Set Map  在遍历Map的时候返回的是一个新的数组  可以使用结构再次获取
+    let a = [1, 2, 3]
+    for (let item of a) {
+      console.log(item) // 1 2 3
+    }
+
+    // 但是for of 无法遍历基本的对象  提供了Iterable接口就是for of 的前提 可以理解为 for of 可以遍历实现了Iterable接口的数据结构
+    // 可以被for of 实现遍历的数据结构  其原型对象上存在Symbol(Symbol.iterable)的一个方法 
+    // 这个方法可以使用obj[Symbol.iterator]()获取  
+    // 获取之后这个方法原型上有一个next()的方法 通过返回调用next 可以从第一项一直获取到最后一项
+    // 也就是说next() 这个原型上的方法是相当于一个指针  (这里感觉就是链表)
+  ```
+
+### &#x1F4DA; ES2015 迭代器
+  ![Image text](./image/image-03.jpg)
+  ```js
+    // 上面描述普通对象无法使用for of去遍历  是因为普通对象没有实现iterable方法(迭代器) 所以我们给定义普通对象自己实现一个迭代器方法
+    let obj = {
+      a: [1, 2, 3],
+      [Symbol.iterator]: function () {
+        const all = [...this.a]
+        let index = 0
+        return {
+          next: function () {
+            return {
+              value: all[index],
+              done: index++ >= all.length
+            }
+          }
+        }
+      }
+    }
+    // 这样我们就可以使用for of了 
+  ```
+
+### &#x1F4DA; ES2015 迭代器模式
+  ```txt
+    迭代器模式我理解的是一种规范的实现，可以使用for of的数据类型 他是在语言层面的迭代器() 这种迭代器更像是一个链表
+    而我们给普通对象实现的迭代器是为了获取对象指定内容的集合
+  ```
+
+### &#x1F4DA; ES2015 生成器函数(Generator)
+  - ![Image text](./image/image-04.jpg)
+    ```js
+      // 在复杂的异步代码 减少回调嵌套  提供更好的异步编程解决方案
+      // 上图中的生成器函数可以看到我们调用foo函数  函数并没有按照预期的执行
+      // 当我们看他的原型上可以看到他也实现了iterator
+      // 他返回一个具有next方法的对象  可以通过next方法去执行函数
+      function * foo() {
+        console.log(123)
+        return 111
+      }
+
+      let result = foo()
+      result.next() // 他会先打印123  之后返回一个和iterator一样的迭代器返回结果 { value: 111, done: true }
+    ```
+
+  - ![Image text](./image/image-05.jpg)
+    ```txt
+      可以看到在调用函数的时候 函数并没有返回值  也就是说函数在没有调用next()方法之前不会执行的，当调用next()方法的时候 函数会执行到存在yield的地方  并将yield后面的值作为next()返回值返回 以此类推
+    ```
+
+  - 发号器
+    ```js
+      function * createIdMaker() {
+        let id = 1
+        while(true) {
+          yield id++
+        }
+      }
+    ```
+
+  - 使用Generator 重写上面普通对象的iterator方法
+    ```js
+      let obj = {
+      a: [1, 2, 3],
+      [Symbol.iterator]: function () {
+        const all = [...this.a]
+        for(let item of all) {
+          yield item
+        }        
+      }
+    }
+    ```
+
+### &#x1F4DA; ES2015 modules
+
+### &#x1F4DA; ES2016 概述
+  ```js
+    // 小版本 
+    // 两个新增
+      // 数组的includes
+      // indexOf 查找数组中指定的值 返回索引 但是无法找到NaN的值
+      // includes找到true  反之   但是可以拿到NaN
+
+      // 幂运算
+      Math.pow(2, 10) // 2的10次幂
+
+      2 ** 10// 2的10次幂
+  ```
+
+### &#x1F4DA; ES2017 概述 ECMAScript的第八个版本 2017-06发布
+  - Object.values
+    ```js
+      let obj = {
+        a: 1,
+        b: 2
+      }
+      Object.values(obj) // [1, 2]
+    ```
+
+  - Object.entries
+    ```js
+      let obj = {
+        a: 1,
+        b: 2
+      }
+      Object.entries(obj) // [ ['a', 1], ['b', 2] ]
+      // 所以这里就可以使用for of去遍历
+      for (let [key, value] of Object.entries(obj)) {
+        console.log(key, value)
+      }
+
+      // 这种二维数组的数据结构可以直接转换成Map对象的数据结构
+      let result = new Map(Object.entries(obj)) // Map(2) {"a" => 1, "b" => 2}
+    ```
+
+  - Object.getOwnPropertyDescriptors
+    ```js
+      // 获取对象的完整描述信息
+      // 一般对象定义的get set属性无法获取
+      let obj = {
+        firstName: 'zhao',
+        lastName: 'hehe',
+        get fullName() {
+          return this.firstName + this.lastName
+        }
+      }
+      // 配合ES5的get set使用
+    ```
+  
+  - padStart padEnd
+    ```js
+      // 按照给定长度使用给定字符补充   可以实现对其的效果！！！
+      a.padStart(16, '-') // "-----------12312"
+      a.padEnd(16, '-')   // "12312-----------"
+    ```
