@@ -699,3 +699,66 @@
       }
     }
   ```
+
+### &#x1F4DA; ES2015 Set
+  ```js
+    // Set 是一个集合 其内部不能存放重复的数据  重复添加会失效 
+    // 介绍用法 
+    let set = new Set()
+    // 因为add方法返回当前set对象  所以可以链式调用
+    set.add(1).add(2).add(3).add(2) // Set(3) { 1, 2, 3 }
+
+    // 遍历
+    set.forEach( i => console.log(i) )   // 这里也可以用for of去遍历哦
+
+    // 获取长度
+    set.size()
+
+    // 判断是否存在某元素
+    set.has(100)
+    set.has(1)
+
+    // 删除指定元素
+    set.delete(2)
+
+    // 清空set
+    set.clear()
+
+    // 主要作用是数组去重
+    let arr = [1, 2, 3, 1, 2, 4]
+
+    let result1 = Array.from(new Set(arr))
+    let result2 = [...new Set(arr)]
+    console.log(result1)
+    console.log(result2)
+  ```
+
+### &#x1F4DA; ES2015 Map 数据结构
+  ```js
+    // js对象 存储的key 不管是什么类型 最后都会转换为string类型 
+    let obj = {}
+    obj[1] = 1
+    obj[true] = 2
+    obj[{ a: 1 }] = 3
+    console.log(obj)
+
+    let m = new Map()
+
+    const tom = { name: 'Tom' }
+
+    m.set(tom, 100)
+
+    console.log(m)
+
+    console.log(m.get(tom))
+
+    m.has()
+    m.delete()
+    m.clear()
+
+
+    // 遍历
+    m.forEach((value, key) => {
+      console.log(value, key)
+    })
+  ```
