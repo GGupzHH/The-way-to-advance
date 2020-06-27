@@ -647,3 +647,55 @@
 
     let person = new Person('ls')
   ```
+
+### &#x1F4DA; ES2015 Class 实例方法  静态方法
+  ```js
+    // 实例方法需要这个类型构造的实例对象去调用
+    // 静态方法直接通过类型本身调用
+
+    // 专门添加静态方法的关键词 static 
+    class Person {
+      constructor(name) {
+        this.name = name
+      }
+
+      say() {
+        console.log(this.name)
+      }
+
+      static sayHi() {
+        return new Person()
+      }
+    }
+    // this不是指向实例对象的  而是指向当前类型
+  ```
+
+### &#x1F4DA; ES2015 Class 继承extends
+  ```js
+    // 继承会继承父类所有的方法和属性  包括静态方法
+    class Person {
+      constructor(name) {
+        this.name = name
+      }
+
+      say() {
+        console.log(this.name)
+      }
+
+      static sayHi() {
+        return new Person()
+      }
+    }
+
+    class Student extends Person{
+      constructor(name, age) {
+        super(name)
+        this.age = age
+      }
+
+      hello() {
+        super.say()
+        console.log(this.age)
+      }
+    }
+  ```
