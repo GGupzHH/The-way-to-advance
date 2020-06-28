@@ -1020,3 +1020,148 @@
     
     - 减少参数类型的判断
 
+  #### &#x1F4DA; JavaScript FLow 代码检查器
+    ```js
+      // 类型注解 类似TS
+      // 初始化yarn
+      yarn init --yes
+      // 安装flow
+      yarn add flow-bin --dev
+      // 要使用flow验证的文件需要在文件开头标明
+      //@flow
+      // 之后初始化flow配置文件
+      yarn flow init
+      // 之后运行flow代码检查器
+      yarn flow
+      // 运行成功之后会提示错误信息
+
+      // 之后关闭这个服务
+      yarn flow stop
+    ```
+
+  #### &#x1F4DA; JavaScript FLow 移除注解
+    ```js
+      // 两种方法
+      // 1. flow官方提供的 flow-remove-types
+      yarn add flow-remove-types --dev
+      // 第一个参数是目标文件目录  第二个参数是 移除结果目录  这里我们将src下面的文件中的注解移除  并且将移除的文件放到一个新的目录下 dist
+      yarn flow-remove-types src -d dist
+
+
+      // 2. babel/core babel/cli babel/preset-flow
+      yarn add @babel/core @babel/cli @babel/preset-flow --dev
+      // 之后我们需要添加一个babel的配置文件 .babelrc
+      {
+        "presets": ["@babel/preset-flow"]
+      }
+      // 参数意义和上面一样
+      yarn babel src -d dist_babel
+    ```
+
+  #### &#x1F4DA; JavaScript FLow 插件
+    ```js
+      // Flow Language Support 会在文件中直接使用
+      // 保存之后才会检查
+    ```
+
+  #### &#x1F4DA; JavaScript FLow 类型推断
+    ```js
+      // 类型推断
+      //@flow
+
+      function square(n) {
+        return n * n
+      }
+
+      square('100')
+      // 当我们这样写的时候flow会出现提示  他推断我们的代码执行不能传入字符串
+
+    ```
+  
+  #### &#x1F4DA; JavaScript FLow 原始类型
+    ```js
+      Boolean
+      Number
+      String
+      undefined
+      Symbol
+      null
+    ```
+
+  #### &#x1F4DA; JavaScript FLow 数组类型
+    ```js
+      let arr: Array<number> = [1, 2] // 数字组成的数组
+      let arr: number[] = [1, 2] // 数字组成的数组
+
+      // 元组
+      let arr: [string, number] = ['1', 1] // 固定长度 固定类型
+    ```
+
+  #### &#x1F4DA; JavaScript FLow 对象类型
+    ```js
+      // ? 可有可无
+      // 定义这个对象的属性和类型 两个属性 foo可有可无 value类型为string  bar必须要 value类型为number
+      let obj: {
+        foo?: string,
+        bar: number
+      } = {
+        foo: "string",
+        bar: 1
+      }
+
+      let obj: {  [string]: number } = {}
+      // 这样就可以给obj 动态添加 key value了   但是添加的的key只能是string value只能是number
+    ```
+
+  #### &#x1F4DA; JavaScript FLow 函数类型
+    ```js
+      // 这里只介绍回调函数的类型定义
+      function add(callback: (string, number) => void) {
+        callback('string', 100)
+      }
+      add()
+
+      // 这里使用函数签名的类型去定义
+      // 限定了回调函数必须有两个参数， 第一个string 第二个number 且函数没有返回值 void
+    ```
+    
+  #### &#x1F4DA; JavaScript FLow 特殊类型
+    ```js
+      // 字面量类型
+      let a: 'foo' = 'foo'  // 只能赋值string 并且值为foo
+
+      // 联合类型
+      let a: 'foo' | 'bar' = 'foo' // 只能赋值string 值为 foo 或者 bar
+
+      // 别名
+      type StringOrNumber = string | number
+      let a: StringOrNumber = 'string'
+
+      // 有可能
+      let a: ?number = 0 //等同于下面
+      let a: number | null | undefined = null
+    ```
+
+  #### &#x1F4DA; JavaScript FLow Mixed Any
+    ```js
+      // mixed 任意类型 还是强类型 在编辑阶段还是会报错
+      function foo(v: mixed) {
+        // 需要添加类型判断的逻辑
+        console.log(v)
+      }
+      foo(1)
+      foo('1')
+      foo([1])
+
+      // 弱类型 不管什么写都没事
+      function foo(v: any) {
+        console.log(v)
+      }
+    ```
+
+  #### &#x1F4DA; JavaScript FLow [小结](www.saltycrane.com/cheat-sheets/flow-type/latest/)
+
+  #### &#x1F4DA; JavaScript FLow 运行环境API
+    ```js
+      
+    ```
