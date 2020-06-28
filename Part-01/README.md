@@ -963,205 +963,384 @@
     ```
 
 ### &#x1F47E; TypeScript 语言
+#### &#x1F4DA; 强类型 弱类型 在语法层次的定义
+  - 强类型
+    ```js
+      // 类型约束 
+      // 没有类型隐式转换
+      // 语言层面就提示错误的
+    ```
+  - 弱类型
+    ```js
+      // 没有类型约束  存在类型隐式转换
+      // 编译阶段 通过逻辑反馈错误
+    ```
+
+#### &#x1F4DA; 静态类型 动态类型
+  - 静态类型
+    ```js
+      // 变量从声明之后类型就不能改变
+      // 编译阶段会做类型检查
+    ```
+  - 动态类型
+    ```js
+      // 定义的变量可以任意改变类型   只是改变了存放的值
+    ```
+
+#### &#x1F4DA; JavaScript 类型系统特征
+  ```txt
+    首先js是一门弱类型动态语言，这是由于当时js的需求只是一门脚本语言，而且当时的js代码也就几百行，如果加上类型系统，这样就会显的很多余，而且当时js是脚本语言，也就是说不存在编译阶段直接就运行。
+  ```
+
+#### &#x1F4DA; JavaScript 弱类型问题
+  ```js
+    const obj = {}
+    obj.name()
+    // 首先obj本身不存在这个方法  此时调用会报错
+    // 但是强类型语言会在语法层面上提示(编码阶段)
+
+    function add(a, b) {
+      return a + b
+      add(100, '100')
+    }
+    // 弱类型语言存在隐式转换当没有注意的时候这种问题的触发几率很高
+
+    obj[true] = 100
+    // 我们定义的键是 true  而对象在定义这个属性的时候会将属性名转换为string 这样就无法获取
+  ```
+
+#### &#x1F4DA; JavaScript 强类型优势
+  - 错误能更早的发现
+
+  - 智能  准确
+
+  - 重构
+  
+  - 减少参数类型的判断
+
+#### &#x1F4DA; JavaScript FLow 代码检查器
+  ```js
+    // 类型注解 类似TS
+    // 初始化yarn
+    yarn init --yes
+    // 安装flow
+    yarn add flow-bin --dev
+    // 要使用flow验证的文件需要在文件开头标明
+    //@flow
+    // 之后初始化flow配置文件
+    yarn flow init
+    // 之后运行flow代码检查器
+    yarn flow
+    // 运行成功之后会提示错误信息
+
+    // 之后关闭这个服务
+    yarn flow stop
+  ```
+
+#### &#x1F4DA; JavaScript FLow 移除注解
+  ```js
+    // 两种方法
+    // 1. flow官方提供的 flow-remove-types
+    yarn add flow-remove-types --dev
+    // 第一个参数是目标文件目录  第二个参数是 移除结果目录  这里我们将src下面的文件中的注解移除  并且将移除的文件放到一个新的目录下 dist
+    yarn flow-remove-types src -d dist
+
+
+    // 2. babel/core babel/cli babel/preset-flow
+    yarn add @babel/core @babel/cli @babel/preset-flow --dev
+    // 之后我们需要添加一个babel的配置文件 .babelrc
+    {
+      "presets": ["@babel/preset-flow"]
+    }
+    // 参数意义和上面一样
+    yarn babel src -d dist_babel
+  ```
+
+#### &#x1F4DA; JavaScript FLow 插件
+  ```js
+    // Flow Language Support 会在文件中直接使用
+    // 保存之后才会检查
+  ```
+
+#### &#x1F4DA; JavaScript FLow 类型推断
+  ```js
+    // 类型推断
+    //@flow
+
+    function square(n) {
+      return n * n
+    }
+
+    square('100')
+    // 当我们这样写的时候flow会出现提示  他推断我们的代码执行不能传入字符串
+
+  ```
+
+#### &#x1F4DA; JavaScript FLow 原始类型
+  ```js
+    Boolean
+    Number
+    String
+    undefined
+    Symbol
+    null
+  ```
+
+#### &#x1F4DA; JavaScript FLow 数组类型
+  ```js
+    let arr: Array<number> = [1, 2] // 数字组成的数组
+    let arr: number[] = [1, 2] // 数字组成的数组
+
+    // 元组
+    let arr: [string, number] = ['1', 1] // 固定长度 固定类型
+  ```
+
+#### &#x1F4DA; JavaScript FLow 对象类型
+  ```js
+    // ? 可有可无
+    // 定义这个对象的属性和类型 两个属性 foo可有可无 value类型为string  bar必须要 value类型为number
+    let obj: {
+      foo?: string,
+      bar: number
+    } = {
+      foo: "string",
+      bar: 1
+    }
+
+    let obj: {  [string]: number } = {}
+    // 这样就可以给obj 动态添加 key value了   但是添加的的key只能是string value只能是number
+  ```
+
+#### &#x1F4DA; JavaScript FLow 函数类型
+  ```js
+    // 这里只介绍回调函数的类型定义
+    function add(callback: (string, number) => void) {
+      callback('string', 100)
+    }
+    add()
+
+    // 这里使用函数签名的类型去定义
+    // 限定了回调函数必须有两个参数， 第一个string 第二个number 且函数没有返回值 void
+  ```
+  
+#### &#x1F4DA; JavaScript FLow 特殊类型
+  ```js
+    // 字面量类型
+    let a: 'foo' = 'foo'  // 只能赋值string 并且值为foo
+
+    // 联合类型
+    let a: 'foo' | 'bar' = 'foo' // 只能赋值string 值为 foo 或者 bar
+
+    // 别名
+    type StringOrNumber = string | number
+    let a: StringOrNumber = 'string'
+
+    // 有可能
+    let a: ?number = 0 //等同于下面
+    let a: number | null | undefined = null
+  ```
+
+#### &#x1F4DA; JavaScript FLow Mixed Any
+  ```js
+    // mixed 任意类型 还是强类型 在编辑阶段还是会报错
+    function foo(v: mixed) {
+      // 需要添加类型判断的逻辑
+      console.log(v)
+    }
+    foo(1)
+    foo('1')
+    foo([1])
+
+    // 弱类型 不管什么写都没事
+    function foo(v: any) {
+      console.log(v)
+    }
+  ```
+
+#### &#x1F4DA; JavaScript FLow [小结](www.saltycrane.com/cheat-sheets/flow-type/latest/)
+
+#### &#x1F4DA; JavaScript FLow 运行环境API
+  ```js
+    // 会有一切DOM的类型
+  ```
+
+#### &#x1F4DA; JavaScript TypeScript 概述
+  ```js
+    // JavaScript的超集
+    // 强大的类型系统
+    // 最后会编译为JavaScript
+    // 完整的编程语言
+    // 渐进式
+    // 小项目会增加开发成本
+  ```
+
+#### &#x1F4DA; JavaScript TypeScript 配置文件
+  ```js
+    // 初始化ts配置文件
+    yarn tsc --init
+
+    // tsconfig.json
+    // target 目标转换的js版本
+    // module 模块化方法
+    // strict 是否开启严格模式
+    // outDir 编译结果目标文件夹
+    // rootDir 需要编译的文件夹
+    // sourceMap 是否开启文件映射
+  ```
+
+#### &#x1F4DA; JavaScript TypeScript 原始类型
+  ```ts
+    // 下面三个 非严格模式默认允许为空 null | undefined
+    // number
+    // string
+    // boolean
+
+    // 函数没有返回值
+    // void 
+    // null
+    // undefined
+
+    // 需要注意一些版本的问题
+    // 比如ES6新发布的Symbol 和 Promise
+    // 当我们在tsconfig.json中配置 ts转换成ES3 或者 ES5  此时代码在编辑阶段就会报错
+    // 以为在ES5之前是没有这两个新对象的
+    // 内置对象在TS中已经声明好了  
+    // 不同的版本内置类型不同(标准库不同)
+    // 当我们就要使用es5去作为标准库的时候 此时可以使用配置文件中的lib 
+    // "lib": ["ES2015", "DOM"] 引入多个标准库
+  ```
+
+#### &#x1F4DA; JavaScript TypeScript 作用域问题
+  ```txt
+    当我们在同一项目中不同ts文件使用相同的变量名的时候 会出现相同名字无法使用的情况
+    是因为最后都会编译到一个js文件中  所以同一变量声明 let 只能声明一次
+
+    所以这时候需要使用模块化 让每个文件都是一个独立的模块
+    export 导出会将当前文件作为一个单独的模块
+  ```
+
+#### &#x1F4DA; JavaScript TypeScript Object类型
+  ```ts
+    // 但是接收原始值就会出错  
+    // Object是除了原始类型以外的其他类型
+    let foo: object = function() {}
+    let foo: object = []
+    let foo: object = {}
+
+    let foo: { foo: string } = {
+      foo: '1'
+    }
+  ```
+
+#### &#x1F4DA; JavaScript TypeScript 数组类型
+```ts
+    let arr: Array<number> = [1, 2, 4]
+    let arr: number[] = [1, 2, 3]
+
+    function add(...arg: number[]) {
+      return arg.reduce((prev, current) => prev + current, 0)
+    }
+    foo(1, 2, 3)
+    // 当传入的不是数字的值就会报错
+  ```
+
+#### &#x1F4DA; JavaScript TypeScript 元组类型
+  ```ts
+    // 不能多也不能少 类型也不能错
+    const tuple: [string, number] = ['1', 1] 
+
+    // 类似Object.entries()
+  ```
+
+#### &#x1F4DA; JavaScript TypeScript 枚举类型
+  ```ts
+    // 可以给一组数据每一个数值起个名字
+    // 只会存在定义好的值  不会存在别的值
+    // 数字枚举类型 
+    enum Direction {
+      Up = 1,
+      Down,
+      Left,
+      Right
+    }
+    const type: number = Direction.Up // 2
+    const indexName = Direction[2] // 'Down'
+    // 当定义枚举类型的时候没有定义第一个枚举值得情况下 默认从0开始  或者只定义了第一个枚举值那么将从当前枚举值递增
+
+    // 字符串枚举
+    enum Direction {
+      Up = "UP",
+      Down = "DOWN",
+      Left = "LEFT",
+      Right = "RIGHT",
+    }
+    // 不能自增
+
+    // 会影响到编译结果  编译结果是一个双向的key value 对象
+    
+    // 常量枚举
+    
+    // 常量枚举不会在编译之后存放一个双向键值对对象  
+    // 所以如果存在下面这种情况就不能使用常量枚举
+    const indexName = Direction[2] // 'Down'
+  ```
+
+#### &#x1F4DA; JavaScript TypeScript 函数类型
+  ```ts
+    // 参数约束 返回值约束
+    function foo(a: number, b: number): string {
+      return a + b + ''
+    }
+    // 可选参数  (可选参数必须放在最后 因为参数是按照顺序传递的)
+    // 方法一
+    function foo(a: number, b?: number): string {
+      return a + b + ''
+    }
+    // 方法二
+    function foo(a: number, b: number = 10): string {
+      return a + b + ''
+    }
+    // 任意参数 ES6 扩展运算符
+    function foo(...b: number[]): string {
+      
+    }
+
+    // 函数表达式 定义函数表达式得到类型
+    let foo: (a: string, b: string): string = function(a: string, b: string): string {
+      return a + b
+    }
+  ```
+
+#### &#x1F4DA; JavaScript TypeScript 任意类型
+  ```ts
+    // any 不会有任何类型检查
+    let a: any = []
+    let a: any = {}
+    let a: any = ''
+  ```
+
+#### &#x1F4DA; JavaScript TypeScript 隐式类型推断
+  ```ts
+    let a = 10 
+    // 隐式默认a为number类型  并且以后不能修改类型  
+
+    let b;
+    // 隐式默认b为any类型 以后可以任意修改
+  ```
+  
+#### &#x1F4DA; JavaScript TypeScript 类型断言
+  ```ts
+    let nums = [111, 111, 111, 111]
+    // 这种情况下 res的类型会被认为是number | undefined  但是我们可以看到实际开发返回的一定是number  所以我们可以断言 nums.find(i => i > 0) 返回的一定是number类型
+    let res = nums.find(i => i > 0)
+
+    // 断言有两种方式
+    let a: number | undefined // a有两种类型
+    // 1. 
+    let b: number = <number>a  // 在不确定类型的前面断言为number
+    // 2.
+    let b: number = a as number // 使用as断言为number
+  ```
 
 ### &#x1F47E; JavaScript 性能优化
-  #### &#x1F4DA; 强类型 弱类型 在语法层次的定义
-    - 强类型
-      ```js
-        // 类型约束 
-        // 没有类型隐式转换
-        // 语言层面就提示错误的
-      ```
-    - 弱类型
-      ```js
-        // 没有类型约束  存在类型隐式转换
-        // 编译阶段 通过逻辑反馈错误
-      ```
   
-  #### &#x1F4DA; 静态类型 动态类型
-    - 静态类型
-      ```js
-        // 变量从声明之后类型就不能改变
-        // 编译阶段会做类型检查
-      ```
-    - 动态类型
-      ```js
-        // 定义的变量可以任意改变类型   只是改变了存放的值
-      ```
-
-  #### &#x1F4DA; JavaScript 类型系统特征
-    ```txt
-      首先js是一门弱类型动态语言，这是由于当时js的需求只是一门脚本语言，而且当时的js代码也就几百行，如果加上类型系统，这样就会显的很多余，而且当时js是脚本语言，也就是说不存在编译阶段直接就运行。
-    ```
-  
-  #### &#x1F4DA; JavaScript 弱类型问题
-    ```js
-      const obj = {}
-      obj.name()
-      // 首先obj本身不存在这个方法  此时调用会报错
-      // 但是强类型语言会在语法层面上提示(编码阶段)
-
-      function add(a, b) {
-        return a + b
-        add(100, '100')
-      }
-      // 弱类型语言存在隐式转换当没有注意的时候这种问题的触发几率很高
-
-      obj[true] = 100
-      // 我们定义的键是 true  而对象在定义这个属性的时候会将属性名转换为string 这样就无法获取
-    ```
-
-  #### &#x1F4DA; JavaScript 强类型优势
-    - 错误能更早的发现
-
-    - 智能  准确
-
-    - 重构
-    
-    - 减少参数类型的判断
-
-  #### &#x1F4DA; JavaScript FLow 代码检查器
-    ```js
-      // 类型注解 类似TS
-      // 初始化yarn
-      yarn init --yes
-      // 安装flow
-      yarn add flow-bin --dev
-      // 要使用flow验证的文件需要在文件开头标明
-      //@flow
-      // 之后初始化flow配置文件
-      yarn flow init
-      // 之后运行flow代码检查器
-      yarn flow
-      // 运行成功之后会提示错误信息
-
-      // 之后关闭这个服务
-      yarn flow stop
-    ```
-
-  #### &#x1F4DA; JavaScript FLow 移除注解
-    ```js
-      // 两种方法
-      // 1. flow官方提供的 flow-remove-types
-      yarn add flow-remove-types --dev
-      // 第一个参数是目标文件目录  第二个参数是 移除结果目录  这里我们将src下面的文件中的注解移除  并且将移除的文件放到一个新的目录下 dist
-      yarn flow-remove-types src -d dist
-
-
-      // 2. babel/core babel/cli babel/preset-flow
-      yarn add @babel/core @babel/cli @babel/preset-flow --dev
-      // 之后我们需要添加一个babel的配置文件 .babelrc
-      {
-        "presets": ["@babel/preset-flow"]
-      }
-      // 参数意义和上面一样
-      yarn babel src -d dist_babel
-    ```
-
-  #### &#x1F4DA; JavaScript FLow 插件
-    ```js
-      // Flow Language Support 会在文件中直接使用
-      // 保存之后才会检查
-    ```
-
-  #### &#x1F4DA; JavaScript FLow 类型推断
-    ```js
-      // 类型推断
-      //@flow
-
-      function square(n) {
-        return n * n
-      }
-
-      square('100')
-      // 当我们这样写的时候flow会出现提示  他推断我们的代码执行不能传入字符串
-
-    ```
-  
-  #### &#x1F4DA; JavaScript FLow 原始类型
-    ```js
-      Boolean
-      Number
-      String
-      undefined
-      Symbol
-      null
-    ```
-
-  #### &#x1F4DA; JavaScript FLow 数组类型
-    ```js
-      let arr: Array<number> = [1, 2] // 数字组成的数组
-      let arr: number[] = [1, 2] // 数字组成的数组
-
-      // 元组
-      let arr: [string, number] = ['1', 1] // 固定长度 固定类型
-    ```
-
-  #### &#x1F4DA; JavaScript FLow 对象类型
-    ```js
-      // ? 可有可无
-      // 定义这个对象的属性和类型 两个属性 foo可有可无 value类型为string  bar必须要 value类型为number
-      let obj: {
-        foo?: string,
-        bar: number
-      } = {
-        foo: "string",
-        bar: 1
-      }
-
-      let obj: {  [string]: number } = {}
-      // 这样就可以给obj 动态添加 key value了   但是添加的的key只能是string value只能是number
-    ```
-
-  #### &#x1F4DA; JavaScript FLow 函数类型
-    ```js
-      // 这里只介绍回调函数的类型定义
-      function add(callback: (string, number) => void) {
-        callback('string', 100)
-      }
-      add()
-
-      // 这里使用函数签名的类型去定义
-      // 限定了回调函数必须有两个参数， 第一个string 第二个number 且函数没有返回值 void
-    ```
-    
-  #### &#x1F4DA; JavaScript FLow 特殊类型
-    ```js
-      // 字面量类型
-      let a: 'foo' = 'foo'  // 只能赋值string 并且值为foo
-
-      // 联合类型
-      let a: 'foo' | 'bar' = 'foo' // 只能赋值string 值为 foo 或者 bar
-
-      // 别名
-      type StringOrNumber = string | number
-      let a: StringOrNumber = 'string'
-
-      // 有可能
-      let a: ?number = 0 //等同于下面
-      let a: number | null | undefined = null
-    ```
-
-  #### &#x1F4DA; JavaScript FLow Mixed Any
-    ```js
-      // mixed 任意类型 还是强类型 在编辑阶段还是会报错
-      function foo(v: mixed) {
-        // 需要添加类型判断的逻辑
-        console.log(v)
-      }
-      foo(1)
-      foo('1')
-      foo([1])
-
-      // 弱类型 不管什么写都没事
-      function foo(v: any) {
-        console.log(v)
-      }
-    ```
-
-  #### &#x1F4DA; JavaScript FLow [小结](www.saltycrane.com/cheat-sheets/flow-type/latest/)
-
-  #### &#x1F4DA; JavaScript FLow 运行环境API
-    ```js
-      
-    ```
