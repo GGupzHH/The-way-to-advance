@@ -1342,5 +1342,171 @@
     let b: number = a as number // 使用as断言为number
   ```
 
+#### &#x1F4DA; JavaScript TypeScript interface接口
+  ```ts
+    interface Post {
+      title: string
+      content: string
+      // 只读
+      readonly summary: string
+      subtitle?: string
+    } 
+
+    function Post(post: Post) {}
+
+    interface Cache {
+      [prop: string]: string
+    }
+
+    let obj: Cache = {}
+    obj.foo = '1'
+    obj.bar = '2'
+  ```
+
+#### &#x1F4DA; JavaScript TypeScript 类 基本使用
+  ```ts
+    // 和ES6的区别就在于 类的属性需要在编辑类的时候就写出来 而不能动态创建属性
+    class Person {
+      name: string
+      age: number
+      constructor(name: string, age: number) {
+        this.name = name
+        this.age = age
+      }
+    }
+  ```
+
+#### &#x1F4DA; JavaScript TypeScript 类 修饰符
+  ```ts
+    class Person {
+      // 共有的
+      public name: string
+      // 私有的  外部访问不到的
+      private age: number
+      // 外部也是无法访问的  但是可以被子类继承
+      protected gender: boolean
+      // 外部可以访问 但是无法修改
+      readonly height: number
+      // 如果需要既是只读 又是外部无法访问的 而且只能子类继承 readonly要写到其他修饰符的后面
+      protected readonly weight: number
+
+      constructor(name: string, age: number) {
+        this.name = name
+        this.age = age
+        gender = true
+      }
+    }
+
+    class Student extends Person {
+      constructor() {
+        super(name, age)
+        // 可以直接继承父类的gender
+        console.log(this.gender) 
+      }
+    }
+    如果我们给constructor 设定成private私有的 那么构造函数将无法new 所有我们只能通过静态方法去构造
+    class Person {
+      // 共有的
+      public name: string
+      // 私有的  外部访问不到的
+      private age: number
+      // 外部也是无法访问的  但是可以被子类继承
+      protected gender: boolean
+      private constructor(name: string, age: number) {
+        this.name = name
+        this.age = age
+        gender = true
+      }
+      static create(name: string, age: number) {
+        return new Person(name, string)
+      }
+    }
+
+    let person = Person.create('zhh', 23)
+  ```
+
+#### &#x1F4DA; JavaScript TypeScript 类的接口
+  ```ts
+    // 每个class中的单独的方法最好使用单独的接口去定义
+    interface Eat{
+      eat(food: string): viod
+    }
+
+    interface Run {
+      run(time: string): viod
+    }
+    // 类定义接口使用 implements 关键词  (类对接口的实现)
+    class Person implements Eat, Run {
+      eat(food:string):viod {
+        console.log('吃了啥' + food)
+      }
+
+      run(time: string):void {
+        console.log('跑多远' + time)
+      }
+    }
+
+  ```
+
+#### &#x1F4DA; JavaScript TypeScript 抽象类
+  ```ts
+    // 定义的抽象类不能new只能被继承
+    abstract class Animal {
+      eat(food: string):void {
+        console.log(`吃${food}`)
+      }
+      // 定义的抽象方法必须在子类实现 这里只是定义了这个方法的接口 
+      abstract run(time: string): void
+    }
+
+    class Dog extends Animal {
+      run(time: string):void {
+        console.log(time)
+      }
+    }
+
+    let tom = new Dog()
+    tom.eat('骨头')
+    tom.run('他在跑')
+  ```
+
+#### &#x1F4DA; JavaScript TypeScript 泛型
+  ```ts
+    // 在我们定义函数的时候 把不确定类型的参数使用泛型定义 就是在用的时候再确定参数的类型
+    // 创建一个number类型的数组
+    function createNumberArr(length: number, value: number):number[] {
+      // Array()创建指定长度的数组 数组的每一项都是empty
+      // Array(length).fill(value) 给数组填充 指定内容
+      return Array<number>(length).fill(value)
+    }
+
+    // 创建一个string类型的数组
+    function createStringArr(length: number, value: string):string[] {
+      // Array()创建指定长度的数组 数组的每一项都是empty
+      // Array(length).fill(value) 给数组填充 指定内容
+      return Array<string>(length).fill(value)
+    }
+
+    // 可见上诉代码极其冗余  所以可以使用泛型  
+    // 在使用函数的时候传入再确定参数的类型  泛型一般取名为 T 
+    function createArr<T>(length: number, value: T):T[] {
+      return Array<T>(length).fill(value)
+    }
+    // 这样定义的泛型  就可以在使用的时候再确定参数类型了
+    createArr<number>(10, 100)
+    createArr<string>(10, '100')
+  ```
+
+#### &#x1F4DA; JavaScript TypeScript 类型声明
+  ```ts
+    // 当我们使用第三方库的时候 如果此时第三方库没有提供类型校验文件
+    import { cameCase } from 'lodash'
+    // 假如我们此时没有安装lodash 的类型校验文件
+    // 但是TS中需要给cameCase这个方法定义类型
+    // 此时这样来做  这个就可以给这个方法定义类型 就可以使用了 
+    declare function cameCase(input: string):string
+
+    // 但是现在一般第三方库都自己集成了@types/lodash 这样的类型声明文件  只需要按照提示安装在开发环境即可
+  ```
 ### &#x1F47E; JavaScript 性能优化
   
