@@ -1509,4 +1509,9 @@
     // 但是现在一般第三方库都自己集成了@types/lodash 这样的类型声明文件  只需要按照提示安装在开发环境即可
   ```
 ### &#x1F47E; JavaScript 性能优化
-  
+
+#### &#x1F4DA; JavaScript JavaScript 性能优化-概述
+  - 内存管理
+  - 垃圾回收与常见的GC算法
+  - V8引擎的垃圾回收
+  - Performance工具
