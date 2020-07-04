@@ -62,8 +62,56 @@
     - 常用的脚手架工具
     - 通用脚手架工具剖析
     - 发开一款脚手脚
+
 #### &#x1F4DA; 常用的脚手架工具
   - 创建项目 通用性项目脚手架 Yeoman
   - 开发过程 创建一些特定类型文件 Plop
 
+#### &#x1F4DA; Yeoman
+  ```txt
+    通过不同Generator搭建不同的脚手架
+    但是在一些场景下 人们觉得不够专注
+  ```
+
+#### &#x1F4DA; Yeoman使用
+  ![Image text](../image/image-01.jpg)
+  ```txt
+    npm install yo -g
+    yo 要搭配Generator去使用
+    不同的Generator能生成不同的项目  所以不同的项目得安装不同的Generator
+  ```
+
+#### &#x1F4DA; Yeoman使用 Sub Generator
+  ![Image text](../image/image-02.jpg)
+  ```txt
+    yo node:cli
+    有时候我们不需要创建完整的项目结构 只需要创建一部分
+    那这时候可以使用yeoman提供的SubGenerator
+
+    之后将这条命令设置成全局的 
+    npm link
+    之后全局my-model --help  就可以看到我们自己安装的cli工具命令了
+  ```
+
+#### &#x1F4DA; Yeoman使用 自定义Generator
+  - 创建一个空文件夹
+  - 初始化npm  npm init -y
+  - 安装一个Generator的基类 npm install yeoman-generator 这里面提供了一些基类函数 让我们创建的时候更加便捷
+  - 安装之后打开这个目录 创建一个文件目录 generators/app/index.js
+  ```txt
+    场景: 市面上的脚手架基本都是基于框架来制定的， 而我们可能实际开发使用的每次都需要配置一些第三方插件  这就让我们需要更多的时间去处理
+
+    自定义Generator可以让我们生成项目的一部分目录结构
+  ```
+
+#### &#x1F4DA; Yeoman使用 自定义Generator 根据模板创建文件
+  - app下面创建templates模板文件 
+  - 先写好模板的内容
+  - 然后确定模板路径  this.templatePath('foo.txt')  会自动去templates下面去找
+  - 确定输出路径  还是使用 this.destinationPath('fooCopy.txt')
+  - 之后灌入
+  - 具体看generator-sample/generator/app/index.js
+  
+#### &#x1F4DA; Yeoman使用 自定义Generator 接收用户传入的数据
+  
 ### &#x1F47E; 自动化构建
