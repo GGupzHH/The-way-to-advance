@@ -113,5 +113,13 @@
   - 具体看generator-sample/generator/app/index.js
   
 #### &#x1F4DA; Yeoman使用 自定义Generator 接收用户传入的数据
-  
+  - 模板语法 <%= keyName %>
+  - 当我们就是想打印出<%= xxx %> 的时候 使用转义 <%%= keyName %>
+
+#### &#x1F4DA; Yeoman使用 自定义Generator 发布到NPM
+  - npm publish
+  - 这里上传到npm的时候可能会提示一个错误  因为国内镜像是只读的问题
+  - 解决方案
+    - 更改本地镜像
+    - 使用 npm publish  --registry=https://  更改为官方镜像
 ### &#x1F47E; 自动化构建
