@@ -81,7 +81,7 @@
     不同的Generator能生成不同的项目  所以不同的项目得安装不同的Generator
   ```
 
-#### &#x1F4DA; Yeoman使用 Sub Generator
+#### &#x1F4DA; Yeoman使用 Sub Generator   ---./generator-sanple
   ![Image text](../image/image-02.jpg)
   ```txt
     yo node:cli
@@ -93,7 +93,7 @@
     之后全局my-model --help  就可以看到我们自己安装的cli工具命令了
   ```
 
-#### &#x1F4DA; Yeoman使用 自定义Generator
+#### &#x1F4DA; Yeoman使用 自定义Generator   ---./generator-vueDemo
   - 创建一个空文件夹
   - 初始化npm  npm init -y
   - 安装一个Generator的基类 npm install yeoman-generator 这里面提供了一些基类函数 让我们创建的时候更加便捷
@@ -113,5 +113,112 @@
   - 具体看generator-sample/generator/app/index.js
   
 #### &#x1F4DA; Yeoman使用 自定义Generator 接收用户传入的数据
-  
+  - 模板语法 <%= keyName %>
+  - 当我们就是想打印出<%= xxx %> 的时候 使用转义 <%%= keyName %>
+
+#### &#x1F4DA; Yeoman使用 自定义Generator 发布到NPM
+  - npm publish
+  - 这里上传到npm的时候可能会提示一个错误  因为国内镜像是只读的问题
+  - 解决方案
+    - 更改本地镜像
+    - 使用 npm publish  --registry=https://  更改为官方镜像
+    
+#### &#x1F4DA; Plop 一个小而美的脚手架工具 ---./Plop
+  - 可以在项目中创建重复的同类型文件
+      
+#### &#x1F4DA; Plop 基本使用
+  - npm init
+  - npm install plop
+  - 根目录创建plop-templates模板文件 
+  - 模板文件后缀 .hbs 文件编辑使用 {{  }} 模板语法
+  - 根目录创建plopfile.js  入口文件
+    ```js
+      // plop 入口文件 需要导出一个函数
+      // 次函数接收一个plop对象  用于创建生成器任务
+
+      module.exports = plop => {
+        plop.setGenerator('component', {
+          // 描述
+          description: 'creaste vue components',
+          prompts: [
+            {
+              type: 'input',
+              name: 'name',
+              message: 'component name',
+              default: 'MyComponents'
+            }
+          ],
+          // 动作对象
+          actioncs: [
+            {
+              type: 'add',
+              // 目标文件路径
+              path: 'components/{{name}}/{{name}}.vue',
+              // 模板路径
+              templateFile: 'plop-templates/components.hbs'
+            }
+          ]
+        })
+      }
+    ```
+  - 需要全局安装plop  npm install plop -g
+  - 之后在命令行启用命令 npm plop component   component是定义的生成器名字
+      
+#### &#x1F4DA; 脚手架工作原理   ---./cliDemo
+  - 结合用户输入 生成一些固定的文件
+  - npm init
+  - 在package.json 创建一个字段 bin 内容为cli入口文件 
+    ```json
+      "bin": "cli.js"
+    ```
+  - 想要和用户交互 需要安装inquirer这样的模块  npm install inquirer
+    ```js
+      inquirer.prompt([
+        {
+          type: 'input',
+          name: 'name',
+          message: 'You Project name?'
+        }
+      ])
+    ```
+  - 接收用户的输入
+    ```js
+      inquirer.prompt([
+        {
+          type: 'input',
+          name: 'name',
+          message: 'You Project name?'
+        }
+      ]).then(anwsers => {
+        console.log(anwsers)
+      })
+    ```
+  - 获取目标目录和模板目录  之后遍历模板文件写入路标目录
+    ```js
+      inquirer.prompt([
+        {
+          type: 'input',
+          name: 'name',
+          message: 'You Project name?'
+        }
+      ]).then(anwsers => {
+        // 根据用户回答生成文件
+        const temPath = path.join(__dirname, 'templates')
+        // 目标目录  获取当前命令行路径
+        const dirPath = process.cwd()
+        // 将模板目录输出到目标目录
+        fs.readdir(temPath, (err, files) => {
+          if (err) throw err
+          files.forEach(file => {
+            // 通过模板渲染文件 这里使用模板引擎 ejs  第一个参数模板绝对路径  第二个当前数据上下文  第三个回调函数
+            ejs.renderFile(path.join(temPath, file), anwsers, (err, result) => {
+              if (err) throw err
+              // 写入目标目录
+              fs.writeFileSync(path.join(dirPath, file), result)
+            })
+          })
+        })
+      })
+    ```
+
 ### &#x1F47E; 自动化构建
