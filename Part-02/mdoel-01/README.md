@@ -122,4 +122,48 @@
   - 解决方案
     - 更改本地镜像
     - 使用 npm publish  --registry=https://  更改为官方镜像
+    
+#### &#x1F4DA; Plop 一个小而美的脚手架工具
+  - 可以在项目中创建重复的同类型文件
+      
+#### &#x1F4DA; Plop 基本使用
+  - npm init
+  - npm install plop
+  - 根目录创建plop-templates模板文件 
+  - 模板文件后缀 .hbs 文件编辑使用 {{  }} 模板语法
+  - 根目录创建plopfile.js  入口文件
+    ```js
+      // plop 入口文件 需要导出一个函数
+      // 次函数接收一个plop对象  用于创建生成器任务
+
+      module.exports = plop => {
+        plop.setGenerator('component', {
+          // 描述
+          description: 'creaste vue components',
+          prompts: [
+            {
+              type: 'input',
+              name: 'name',
+              message: 'component name',
+              default: 'MyComponents'
+            }
+          ],
+          // 动作对象
+          actioncs: [
+            {
+              type: 'add',
+              // 目标文件路径
+              path: 'components/{{name}}/{{name}}.vue',
+              // 模板路径
+              templateFile: 'plop-templates/components.hbs'
+            }
+          ]
+        })
+      }
+    ```
+  - 需要全局安装plop  npm install plop -g
+  - 之后在命令行启用命令 npm plop component   component是定义的生成器名字
+      
+#### &#x1F4DA; 脚手架工作原理
+  
 ### &#x1F47E; 自动化构建
