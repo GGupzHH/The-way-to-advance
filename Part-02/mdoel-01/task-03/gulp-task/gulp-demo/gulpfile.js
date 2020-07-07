@@ -7,7 +7,7 @@ const plugins = loadPlugins()
 // 因为del不是gulp的插件 所以只能单独引入
 const del = require('del')
 
-// 因为项目是通过模板构建的  所以我们需要起一个服务去执行
+// 因为项目是通过模板构建的  所以我们需要起一个服务去执行 这个插件可以构建服务
 const browserSync = require('browser-sync')
 const bs = browserSync.create()
 
@@ -51,10 +51,11 @@ const data = {
   pkg: require('./package.json'),
   date: new Date()
 }
-
+// src流处理操作的目标文件   base 转换的时候的基准路径  也就是是否保持原有的目录结构
 const style = () => src('src/assets/styles/*.scss', { base: 'src' })
   // 将未换行的括号换行
   .pipe(plugins.sass({ outputStyle: 'expanded' }))
+  // 流处理操作的结果文件
   .pipe(dest('temp'))
 
 const script = () => src('src/assets/scripts/*.js', { base: 'src' })
@@ -63,8 +64,8 @@ const script = () => src('src/assets/scripts/*.js', { base: 'src' })
   .pipe(dest('temp'))
 
 const templ = () => src('src/**/*.html', {  base: 'src' })
-  // swig是这里用的这个模板引擎  所以需要对应的包去构建
-  .pipe(plugins.swig({ data, defaults: { cache: false } }))
+  // swig是这里用的这个模板引擎  所以需要对应的包去构建  data是模板传入的数据
+  .pipe(plugins.swig({ data }))
   .pipe(dest('temp'))
 
 // 因为构建阶段 我们只需要把项目跑起来 所以图片和字体不需要放到构建阶段的文件中 而是把处理结果直接放到dist
