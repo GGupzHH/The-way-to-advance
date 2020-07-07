@@ -86,8 +86,10 @@ const clean = () => del(['dist', 'temp'])
 
 const runServe = () => {
   bs.init({
-    // 是否默认打开浏览器
+    // 右上角提示是否显示
     notify: false,
+    // 是否默认打开浏览器
+    open: false,
     port: 10011,
     server: {
       // 启动服务的路径
@@ -103,7 +105,7 @@ const runServe = () => {
 // 用并行任务分别处理
 const basic = parallel(style, script, templ)
 
-// 开发阶段(开发环境)
+// 开发阶段(开发环境)  只是编译 为了能执行
 const serve = series(basic, runServe)
 // 打包阶段(生产环境)
 const build = series(
