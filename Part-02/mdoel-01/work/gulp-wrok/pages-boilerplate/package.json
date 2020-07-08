@@ -25,11 +25,8 @@
   },
   "scripts": {
     "clean": "gulp clean",
-    "lint": "gulp lint",
     "serve": "gulp serve",
-    "build": "gulp build",
-    "start": "gulp start",
-    "deploy": "gulp deploy --production"
+    "build": "gulp build"
   },
   "browserslist": [
     "last 1 version",

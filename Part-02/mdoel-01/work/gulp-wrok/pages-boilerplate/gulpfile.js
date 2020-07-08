@@ -101,12 +101,12 @@ const runServe = () => {
   watch('src/assets/styles/*.scss', style)
   watch('src/assets/scripts/*.js', script)
   watch('src/**/*.html', page)
-
   watch([
     'src/assets/fonts/**',
     'src/assets/images/**',
     'public/**'
   ], bs.reload)
+  // init serve
   bs.init({
     notify: false,
     port: 10012,
@@ -118,6 +118,19 @@ const runServe = () => {
       }
     }
   })
+}
+
+const compress = () => {
+  return src('temp/*.html', { base: 'temp' })
+    .pipe(plugins.useref({ searchPath: ['temp', '.'] }))
+    .pipe(plugins.if(/\.js$/, plugins.uglify()))
+    .pipe(plugins.if(/\.css$/, plugins.cleanCss()))
+    .pipe(plugins.if(/\.html$/, plugins.htmlmin({
+      collapseWhitespace: true,
+      minifyCSS: true,
+      minifyJS: true
+    })))
+    .pipe(dest('dist'))
 }
 
 // task clean
@@ -135,7 +148,7 @@ const serve = series(basic, runServe)
 const build = series(
   clean,
   parallel(
-    series(basic),
+    series(basic, compress),
     images,
     font,
     public
