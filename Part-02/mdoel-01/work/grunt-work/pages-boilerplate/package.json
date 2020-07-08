@@ -38,12 +38,24 @@
     "not dead"
   ],
   "dependencies": {
+    "@babel/core": "^7.10.4",
+    "@babel/preset-env": "^7.10.4",
     "bootstrap": "4.4.1",
+    "browser-sync": "^2.26.7",
+    "grunt": "^1.2.1",
+    "grunt-babel": "^8.0.0",
+    "grunt-contrib-clean": "^2.0.0",
+    "grunt-contrib-cssmin": "^3.0.0",
+    "grunt-contrib-htmlmin": "^3.1.0",
+    "grunt-contrib-sass": "^1.0.0",
+    "grunt-contrib-uglify": "^4.0.1",
+    "grunt-contrib-watch": "^1.1.0",
     "jquery": "3.4.1",
-    "popper.js": "1.16.1"
+    "load-grunt-tasks": "^5.1.0",
+    "popper.js": "1.16.1",
+    "sass": "^1.26.10"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "engines": {
     "node": ">=6"
   }
