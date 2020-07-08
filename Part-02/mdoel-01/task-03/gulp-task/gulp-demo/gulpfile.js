@@ -134,6 +134,22 @@ const runServe = () => {
   })
 }
 
+// 用于build阶段  代码压缩  压缩过后可以在dist中利用http-server  或者 serve再启动一个服务去测试打包结果是否正确
+const building = () => {
+  return src('temp/*.html', { base: 'temp' })
+    // 将项目中一些对node_modules的依赖收集起来放到一个文件  只是收集  并不压缩
+    .pipe(plugins.useref({ searchPath: ['temp', '.'] }))
+    // html js css 收集之后有各种文件  所以这里需要 gulp-if判断文件类型  不同的文件使用不同的压缩工具压缩 使用正则匹配文件
+    .pipe(plugins.if(/\.js$/, plugins.uglify()))
+    .pipe(plugins.if(/\.css$/, plugins.cleanCss()))
+    .pipe(plugins.if(/\.html$/, plugins.htmlmin({
+      collapseWhitespace: true,
+      minifyCSS: true,
+      minifyJS: true
+    })))
+    .pipe(dest('dist'))
+}
+
 // 用并行任务分别处理
 const basic = parallel(style, script, templ)
 
@@ -143,7 +159,7 @@ const serve = series(basic, runServe)
 const build = series(
   clean,
   parallel(
-    series(basic),
+    series(basic, building),
     images,
     font,
     extra
