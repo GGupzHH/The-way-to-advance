@@ -1,4 +1,4 @@
-const { src, dest, parallel, series } = require('gulp')
+const { src, dest, parallel, series, watch } = require('gulp')
 
 // loadin plugins
 const loadPlugins = require('gulp-load-plugins')
@@ -98,6 +98,15 @@ const public = () => {
 
 // task serve
 const runServe = () => {
+  watch('src/assets/styles/*.scss', style)
+  watch('src/assets/scripts/*.js', script)
+  watch('src/**/*.html', page)
+
+  watch([
+    'src/assets/fonts/**',
+    'src/assets/images/**',
+    'public/**'
+  ], bs.reload)
   bs.init({
     notify: false,
     port: 10012,
