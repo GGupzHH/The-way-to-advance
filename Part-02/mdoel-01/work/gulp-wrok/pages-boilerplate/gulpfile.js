@@ -57,6 +57,7 @@ const style = () => {
   return src('src/assets/styles/*.scss', { base: 'src' })
   .pipe(plugins.sass())
   .pipe(dest('temp'))
+  .pipe(bs.reload({ stream: true }))
 }
 
 // task style ES6+ -> ES3
@@ -64,13 +65,35 @@ const script = () => {
   return src('src/assets/scripts/*.js', { base: 'src' })
     .pipe(plugins.babel({ presets: [ '@babel/preset-env' ] }))
     .pipe(dest('temp'))
-}
-
+    .pipe(bs.reload({ stream: true }))
+  }
+  
 // task template-popper -> html
 const page = () => {
   return src('src/**/*.html', { base: 'src' })
     .pipe(plugins.swig({ data, defaults: { cache: false } }))
     .pipe(dest('temp'))
+    .pipe(bs.reload({ stream: true }))
+}
+  
+// task image -> minImage
+const images = () => {
+    return src('src/assets/images/**', { base: 'src' })
+    .pipe(plugins.imagemin())
+    .pipe(dest('dist'))
+}
+
+// task fontSvg
+const font = () => {
+  return src('src/assets/fonts/**', { base: 'src' })
+    .pipe(plugins.imagemin())
+    .pipe(dest('dist'))
+}
+
+// task public
+const public = () => {
+  return src('public/**', { base: 'public' })
+    .pipe(dest('dist'))
 }
 
 // task serve
@@ -93,13 +116,25 @@ const clean = () => {
   return del(['dist', 'temp'])
 }
 
-// run parallel DevBasicTask
+// run DevBasicTask
 const basic = parallel(style, script, page)
 
-// run series devServe
+// run devServe
 const serve = series(basic, runServe)
+
+// run production build
+const build = series(
+  clean,
+  parallel(
+    series(basic),
+    images,
+    font,
+    public
+  )
+)
 
 module.exports = {
   serve,
-  clean
+  clean,
+  build
 }
