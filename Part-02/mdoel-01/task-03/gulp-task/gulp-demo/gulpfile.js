@@ -1,4 +1,4 @@
-const { src, dest, parallel, series } = require('gulp')
+const { src, dest, parallel, series, watch } = require('gulp')
 
 // 如果我们继续扩展 那么就需要更多的插件引入  所以我们需要一个一次性全部引入的插件
 const loadPlugins = require('gulp-load-plugins')
@@ -52,40 +52,68 @@ const data = {
   date: new Date()
 }
 // src流处理操作的目标文件   base 转换的时候的基准路径  也就是是否保持原有的目录结构
-const style = () => src('src/assets/styles/*.scss', { base: 'src' })
-  // 将未换行的括号换行
-  .pipe(plugins.sass({ outputStyle: 'expanded' }))
-  // 流处理操作的结果文件
-  .pipe(dest('temp'))
+const style = () => {
+  return src('src/assets/styles/*.scss', { base: 'src' })
+    // 将未换行的括号换行
+    .pipe(plugins.sass({ outputStyle: 'expanded' }))
+    // 流处理操作的结果文件
+    .pipe(dest('temp'))
+    .pipe(bs.reload({ stream: true }))
+}
 
-const script = () => src('src/assets/scripts/*.js', { base: 'src' })
-  // 你得告诉他用什么去处理
-  .pipe(plugins.babel({ presets: ['@babel/preset-env'] }))
-  .pipe(dest('temp'))
+const script = () => {
+  return src('src/assets/scripts/*.js', { base: 'src' })
+    // 你得告诉他用什么去处理
+    .pipe(plugins.babel({ presets: ['@babel/preset-env'] }))
+    .pipe(dest('temp'))
+    .pipe(bs.reload({ stream: true }))
+}
 
-const templ = () => src('src/**/*.html', {  base: 'src' })
-  // swig是这里用的这个模板引擎  所以需要对应的包去构建  data是模板传入的数据
-  .pipe(plugins.swig({ data }))
-  .pipe(dest('temp'))
+const templ = () => {
+  return src('src/**/*.html', {  base: 'src' })
+    // swig是这里用的这个模板引擎  所以需要对应的包去构建  data是模板传入的数据
+    .pipe(plugins.swig({ data, defaults: { cache: false } })) // defaults模板会有缓存 不能热更新
+    .pipe(dest('temp'))
+    .pipe(bs.reload({ stream: true }))
+}
 
 // 因为构建阶段 我们只需要把项目跑起来 所以图片和字体不需要放到构建阶段的文件中 而是把处理结果直接放到dist
-const images = () => src('src/assets/images/**', {  base: 'src' })
-  .pipe(plugins.imagemin())
-  .pipe(dest('dist'))
+const images = () => {
+  return src('src/assets/images/**', {  base: 'src' })
+    .pipe(plugins.imagemin())
+    .pipe(dest('dist'))
+}
 
   // 因为font下面我们只需要把SVG去处理
-const font = () => src('src/assets/fonts/**', { base: 'src' })
-  .pipe(plugins.imagemin())
-  .pipe(dest('dist'))
+const font = () => {
+  return src('src/assets/fonts/**', { base: 'src' })
+    .pipe(plugins.imagemin())
+    .pipe(dest('dist'))
+}
 
 // public 静态文件直接放到dist下面  
-const extra = () => src('public/**', { base: 'public' })
-  .pipe(dest('dist'))
+const extra = () => {
+  return src('public/**', { base: 'public' })
+    .pipe(dest('dist'))
+}
 
 // 为了优化每次更新都需要删除
-const clean = () => del(['dist', 'temp'])
+const clean = () => {
+  return del(['dist', 'temp'])
+}
 
 const runServe = () => {
+  // 热更新实现
+  // 检测源文件的变化 变化后重新编译
+  watch('src/assets/styles/*.scss', style)
+  watch('src/assets/scripts/*.js', script)
+  watch('src/**/*.html', templ)
+  // 当检测到静态文件变化的时候 重启服务
+  watch([
+    'src/assets/images/**',
+    'src/assets/fonts/**',
+    'public/**'
+  ], bs.reload())
   bs.init({
     // 右上角提示是否显示
     notify: false,
