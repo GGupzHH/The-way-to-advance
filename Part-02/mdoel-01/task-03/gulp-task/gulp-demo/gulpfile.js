@@ -119,6 +119,7 @@ const build = series(
   )
 )
 module.exports = {
+  clean,
   build,
   serve
 }
