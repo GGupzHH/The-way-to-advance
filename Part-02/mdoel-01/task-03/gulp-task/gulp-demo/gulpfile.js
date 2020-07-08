@@ -66,6 +66,7 @@ const script = () => {
     // 你得告诉他用什么去处理
     .pipe(plugins.babel({ presets: ['@babel/preset-env'] }))
     .pipe(dest('temp'))
+    // 这里可以在下面直接bs配置中使用files直接监视文件改变  但是这里为了减少开销 在这里使用流的方式给浏览器
     .pipe(bs.reload({ stream: true }))
 }
 
@@ -103,8 +104,8 @@ const clean = () => {
 }
 
 const runServe = () => {
-  // 热更新实现
   // 检测源文件的变化 变化后重新编译
+  // 部分文件修改只触发指定任务 减少任务开销
   watch('src/assets/styles/*.scss', style)
   watch('src/assets/scripts/*.js', script)
   watch('src/**/*.html', templ)
@@ -113,13 +114,15 @@ const runServe = () => {
     'src/assets/images/**',
     'src/assets/fonts/**',
     'public/**'
-  ], bs.reload())
+    // 自动更新浏览器
+  ], bs.reload)
   bs.init({
     // 右上角提示是否显示
     notify: false,
     // 是否默认打开浏览器
     open: false,
     port: 10011,
+    // files: 'dist/**',  监控dist下面的所有文件
     server: {
       // 启动服务的路径
       baseDir: ['temp', 'src', 'public'],
