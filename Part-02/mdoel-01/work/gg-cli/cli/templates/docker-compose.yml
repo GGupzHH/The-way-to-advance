@@ -1,0 +1,29 @@
+#version: "3"
+#services:
+#  web:
+#    build: .
+#    image: "init"
+#    restart: always
+#    ports:
+#      - "9801:9801"
+#    volumes:
+#      - logvolume01:/var/log
+#volumes:
+#  logvolume01: {}
+
+
+version: "3"
+services:
+  vue:
+    build: .
+    volumes:
+      - dist:/app/dist
+  nginx:
+    image: nginx
+    volumes:
+      - dist:/usr/share/nginx/html:ro
+    ports:
+      - "8080:80"
+      - "8443:443"
+volumes:
+  dist:

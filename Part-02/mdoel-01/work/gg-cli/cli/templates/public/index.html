@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="icon" href="<%%= BASE_URL %>favicon.ico" />
+    <title><%= name %></title>
+    <!-- <script src="./vendor/vendor.dll.js"></script> -->
+    <script>
+      (function (window) {
+        function judgeBrowser () {
+          var userAgent = navigator.userAgent
+          if (userAgent.indexOf("Opera") > -1) return "Opera"
+          if (userAgent.indexOf("Firefox") > -1) return "Firefox"
+          if (userAgent.indexOf("Chrome") > -1) return "Chrome"
+          if (userAgent.indexOf("Safari") > -1) return "Safari"
+          if (userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") || userAgent.indexOf('Trident')) return "IE"
+          if (userAgent.indexOf("Trident") > -1) return "Edge"
+        }
+        window.judgeBrowser = judgeBrowser
+      })(window)
+      if (judgeBrowser() !== 'Chrome') {
+        alert('请切换到谷歌浏览器或360浏览器(极速模式)')
+      }
+    </script>
+  </head>
+  <body>
+    <noscript>
+      <strong
+        >We're sorry but cqtbreri-front doesn't work properly without JavaScript
+        enabled. Please enable it to continue.</strong
+      >
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>
