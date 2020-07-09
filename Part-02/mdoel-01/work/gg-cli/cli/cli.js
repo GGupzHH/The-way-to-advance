@@ -34,7 +34,6 @@ inquirer.prompt([
       fs.stat(_src, function (err, stats) { //stats  该对象 包含文件属性
         if (err) throw err;
         if (stats.isFile()) { //如果是个文件则拷贝
-  
           ejs.renderFile(_src, anwsers, (err, result) => {
             if (err) throw err
             // 写入目标目录

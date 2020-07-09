@@ -135,7 +135,7 @@ const compress = () => {
 
 // task clean
 const clean = () => {
-  return del(['dist', 'temp'])
+  return del(['dist'])
 }
 
 // run DevBasicTask
