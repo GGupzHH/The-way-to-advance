@@ -199,15 +199,6 @@ module.exports = grunt => {
         tasks: ['web_swig', 'bs-reload']
       }
     },
-    
-    ghDeploy: {
-      options: {
-        repository: 'https://github.com/2604150210/pages-boilerplate-grunt.git',
-        deployPath: 'dist',
-       	branch: grunt.option('branch') || 'gh-pages',
-    	  message: 'Auto deplyment ' + grunt.template.today()
-    },
-    }
   })
 
   grunt.registerTask("jal-useref", function () {
@@ -252,8 +243,8 @@ module.exports = grunt => {
     const done = this.async();
     bs.init({
       notify: false,
-      port: grunt.option('port') || 2080,
-      open: grunt.option('open'),
+      port: 10011,
+      open: false,
       // files: 'temp/**',
       server: {
         baseDir: ['dist', 'src', 'public'], // 按顺序查找
