@@ -1,0 +1,14 @@
+build/*.js
+src/views/*.vue
+src/components/index/*.vue
+src/components/common/*.vue
+src/components/company/*.vue
+src/*.ts
+src/App.vue
+src/router/*.ts
+src/api.*.ts
+src/utils/*.ts
+src/excel
+dist/*.js
+src/assets
+tests/unit/coverage

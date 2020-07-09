@@ -13,23 +13,16 @@
   "bugs": {
     "url": "https://github.com/zce/pages-boilerplate/issues"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/zce/pages-boilerplate.git"
-  },
+  "repository": "git+https://github.com/zce/pages-boilerplate.git",
   "license": "MIT",
-  "author": {
-    "name": "zce",
-    "email": "w@zce.me",
-    "url": "https://zce.me"
-  },
+  "author": "zce <w@zce.me> (https://zce.me)",
   "scripts": {
-    "clean": "gulp clean",
-    "lint": "gulp lint",
-    "serve": "gulp serve",
-    "build": "gulp build",
-    "start": "gulp start",
-    "deploy": "gulp deploy --production"
+    "clean": "grunt clean",
+    "lint": "grunt lint",
+    "serve": "grunt serve",
+    "build": "grunt build",
+    "start": "grunt start",
+    "deploy": "grunt deploy --production"
   },
   "browserslist": [
     "last 1 version",
@@ -38,25 +31,39 @@
     "not dead"
   ],
   "dependencies": {
-    "@babel/core": "^7.10.4",
-    "@babel/preset-env": "^7.10.4",
-    "bootstrap": "4.4.1",
+    "@babel/core": "^7.10.2",
+    "@babel/preset-env": "^7.10.2",
+    "bootstrap": "^4.5.0",
     "browser-sync": "^2.26.7",
+    "concat": "^1.0.3",
     "grunt": "^1.2.1",
     "grunt-babel": "^8.0.0",
+    "grunt-browser-sync": "^2.2.0",
     "grunt-contrib-clean": "^2.0.0",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-csslint": "^2.0.0",
     "grunt-contrib-cssmin": "^3.0.0",
     "grunt-contrib-htmlmin": "^3.1.0",
-    "grunt-contrib-sass": "^1.0.0",
+    "grunt-contrib-jshint": "^2.1.0",
     "grunt-contrib-uglify": "^4.0.1",
     "grunt-contrib-watch": "^1.1.0",
-    "jquery": "3.4.1",
+    "grunt-eslint": "^23.0.0",
+    "grunt-gh-deploy": "^0.1.3",
+    "grunt-html-build": "^0.7.1",
+    "grunt-html-template": "^0.1.6",
+    "grunt-sass": "^3.1.0",
+    "grunt-sass-lint": "^0.2.4",
+    "grunt-scss-lint": "^0.5.0",
+    "grunt-useref": "0.0.16",
+    "grunt-web-swig": "^0.3.1",
     "load-grunt-tasks": "^5.1.0",
-    "popper.js": "1.16.1",
-    "sass": "^1.26.10"
+    "sass": "^1.26.8",
+    "useref": "^1.4.3"
   },
   "devDependencies": {},
   "engines": {
     "node": ">=6"
-  }
+  },
+  "main": "index.js"
 }
