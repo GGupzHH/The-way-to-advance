@@ -224,7 +224,100 @@
 ### &#x1F47E; 自动化构建
         
 #### &#x1F4DA; 自动化构建简介
+  - 机器代替手动完成工作
+  - 构建就是从一个东西转换为另一个东西
+  - 源代码 -> 生产环境代码 (提高开发效率)
 
 #### &#x1F4DA; 常用的自动化构建工具
+  - Grunt
+    ```txt
+      构建过程基于临时文件实现，构建速度比较慢 每一步都会有磁盘读写操作
+    ```
+  - Gulp
+    ```txt
+      基于内存实现 相对于磁盘读写效率就高很多  支持同时支持多个任务
+    ```
+  - FIS
+    ```txt
+      百度开发
+      大而全
+    ```
 
 #### &#x1F4DA; Grunt使用
+  - 定义任务
+    ```js
+      module.exports = grunt => {
+        // 定义任务foo
+        grunt.registerTask('foo', 'is foo', () => {
+          console.log('foo')
+        })
+        
+        // 定义任务bar
+        grunt.registerTask('bar', 'is bar', () => {
+          console.log('bar')
+        })
+        
+        // 定义任务other 并且在任务内部使用任务foo  bar
+        grunt.registerTask('other', () => {
+          console.log(123)
+          grunt.task.run('foo', 'bar')
+        })
+      }
+    ```
+    ```txt
+      使用npm window 需要全局安装grunt-cli
+      grunt foo
+      grunt bar
+      grunt other
+    ```
+
+  - 默认执行任务
+    ```js
+      module.exports = grunt => {
+        // 定义任务foo
+        grunt.registerTask('foo', 'is foo', () => {
+          console.log('foo')
+        })
+        
+        // 定义任务bar
+        grunt.registerTask('bar', 'is bar', () => {
+          console.log('bar')
+        })
+        
+        // 定义任务other 并且在任务内部使用任务foo  bar
+        grunt.registerTask('other', () => {
+          console.log(123)
+          grunt.task.run('foo', 'bar')
+        })
+        
+        // 默认任务执行  foo bar   
+        // grunt
+        grunt.registerTask('default', 'is default', ['foo', 'bar'])
+      }
+    ```
+
+  - 异步任务
+    ```js
+      // 异步任务
+      // 由于函数体中需要使用 this，所以这里不能使用箭头函数
+      // 如果需要异步可以使用 this.async() 方法创建回调函数
+      // 默认 grunt 采用同步模式编码
+      grunt.registerTask('async-task', function() {
+        const done = this.async()
+        setTimeout(() => {
+          grunt.task.run('foo')
+          // 异步结束之后调用done
+          done()
+        }, 1000);
+      })
+    ```
+
+  - 任务执行失败
+    ```js
+      // 怎么让任务执行失败  registerTask的回调函数返回false
+      grunt.registerTask('err-task', () => {
+        console.log('err-task-message')
+        return false
+      })
+    ```
+#### &#x1F4DA; Gulp使用
