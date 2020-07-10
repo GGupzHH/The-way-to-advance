@@ -321,3 +321,140 @@
       })
     ```
 #### &#x1F4DA; Gulp使用
+  - 定义任务
+    ```js
+      exports.foo = done => {
+        console.log(123)
+        done()
+      }
+    ```
+    ```txt
+      npm install gulp-cli -g
+      gulp foo
+    ```
+
+  - 可以返回Promise来判断任务执行是否成功
+    ```js
+      // promise的状态也可以作为返回值返回 去作为任务的返回对象
+      exports.promise = () => {
+        console.log('promise task')
+        return Promise.resolve()
+      }
+    ```
+
+  - 异步任务
+    ```js
+      const timeout = time => {
+        return new Promise(resolve => {
+          setTimeout(resolve, time)
+        })
+      }
+
+      exports.async = async () => {
+        await timeout(1000)
+        console.log('async task')
+      }
+    ```
+  
+  - process
+    ```js
+      const fs = require('fs')
+      const { Transform } = require('stream')
+
+      exports.default = () => {
+        // 文件读取流
+        const readStream = fs.createReadStream('normalize.css')
+
+        // 文件写入流
+        const writeStream = fs.createWriteStream('normalize.min.css')
+
+        //  转换流
+        const transformStream = new Transform({
+          // 核心转换过程
+          transform: (chunk, encoding, callback) => {
+            // 当前文件流转换为string
+            const input = chunk.toString()
+            const output = input.replace(/\s+/g, '').replace(/\/\*.+?\*\//g, '')
+            // 错误优先的回调函数
+            callback(null, output)
+          }
+        })
+        return readStream
+          .pipe(transformStream) // 转换
+          .pipe(writeStream) // 写入
+      }
+    ```
+
+  - 文件流操作
+    ```js
+      const { src, dest }  = require('gulp')
+      const style = () => {
+        // 读取流
+        return src('src/assets/styles/*.scss', { base: 'src' })
+          // 将未换行的括号换行 用对应的插件处理流
+          .pipe(plugins.sass({ outputStyle: 'expanded' }))
+          // 流处理操作的结果文件
+          .pipe(dest('temp'))
+      }
+      module.exports = {
+        style
+      }
+    ```
+    ```
+    ```
+
+  - 串行任务/并行任务
+    - series 串行
+      ```js
+        const { src, dest, series }  = require('gulp')
+        const style = () => {
+          // 读取流
+          return src('src/assets/styles/*.scss', { base: 'src' })
+            // 将未换行的括号换行 用对应的插件处理流
+            .pipe(plugins.sass({ outputStyle: 'expanded' }))
+            // 流处理操作的结果文件
+            .pipe(dest('temp'))
+        }
+
+        const script = () => {
+          return src('src/assets/scripts/*.js', { base: 'src' })
+            // 你得告诉他用什么去处理
+            .pipe(plugins.babel({ presets: ['@babel/preset-env'] }))
+            .pipe(dest('temp'))
+            // 这里可以在下面直接bs配置中使用files直接监视文件改变  但是这里为了减少开销 在这里使用流的方式给浏览器
+            .pipe(bs.reload({ stream: true }))
+        }
+        // 串行 先执行style 再执行script
+        const foo = series(style, script)
+
+        module.exports = {
+          foo
+        }
+      ```
+    - parallel 并行
+      ```js
+        const { src, dest, parallel }  = require('gulp')
+        const style = () => {
+          // 读取流
+          return src('src/assets/styles/*.scss', { base: 'src' })
+            // 将未换行的括号换行 用对应的插件处理流
+            .pipe(plugins.sass({ outputStyle: 'expanded' }))
+            // 流处理操作的结果文件
+            .pipe(dest('temp'))
+        }
+
+        const script = () => {
+          return src('src/assets/scripts/*.js', { base: 'src' })
+            // 你得告诉他用什么去处理
+            .pipe(plugins.babel({ presets: ['@babel/preset-env'] }))
+            .pipe(dest('temp'))
+            // 这里可以在下面直接bs配置中使用files直接监视文件改变  但是这里为了减少开销 在这里使用流的方式给浏览器
+            .pipe(bs.reload({ stream: true }))
+        }
+        // 并行执行
+        const foo = parallel(style, script)
+
+        module.exports = {
+          foo
+        }
+      ```
