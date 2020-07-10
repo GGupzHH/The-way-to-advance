@@ -224,7 +224,237 @@
 ### &#x1F47E; 自动化构建
         
 #### &#x1F4DA; 自动化构建简介
+  - 机器代替手动完成工作
+  - 构建就是从一个东西转换为另一个东西
+  - 源代码 -> 生产环境代码 (提高开发效率)
 
 #### &#x1F4DA; 常用的自动化构建工具
+  - Grunt
+    ```txt
+      构建过程基于临时文件实现，构建速度比较慢 每一步都会有磁盘读写操作
+    ```
+  - Gulp
+    ```txt
+      基于内存实现 相对于磁盘读写效率就高很多  支持同时支持多个任务
+    ```
+  - FIS
+    ```txt
+      百度开发
+      大而全
+    ```
 
 #### &#x1F4DA; Grunt使用
+  - 定义任务
+    ```js
+      module.exports = grunt => {
+        // 定义任务foo
+        grunt.registerTask('foo', 'is foo', () => {
+          console.log('foo')
+        })
+        
+        // 定义任务bar
+        grunt.registerTask('bar', 'is bar', () => {
+          console.log('bar')
+        })
+        
+        // 定义任务other 并且在任务内部使用任务foo  bar
+        grunt.registerTask('other', () => {
+          console.log(123)
+          grunt.task.run('foo', 'bar')
+        })
+      }
+    ```
+    ```txt
+      使用npm window 需要全局安装grunt-cli
+      grunt foo
+      grunt bar
+      grunt other
+    ```
+
+  - 默认执行任务
+    ```js
+      module.exports = grunt => {
+        // 定义任务foo
+        grunt.registerTask('foo', 'is foo', () => {
+          console.log('foo')
+        })
+        
+        // 定义任务bar
+        grunt.registerTask('bar', 'is bar', () => {
+          console.log('bar')
+        })
+        
+        // 定义任务other 并且在任务内部使用任务foo  bar
+        grunt.registerTask('other', () => {
+          console.log(123)
+          grunt.task.run('foo', 'bar')
+        })
+        
+        // 默认任务执行  foo bar   
+        // grunt
+        grunt.registerTask('default', 'is default', ['foo', 'bar'])
+      }
+    ```
+
+  - 异步任务
+    ```js
+      // 异步任务
+      // 由于函数体中需要使用 this，所以这里不能使用箭头函数
+      // 如果需要异步可以使用 this.async() 方法创建回调函数
+      // 默认 grunt 采用同步模式编码
+      grunt.registerTask('async-task', function() {
+        const done = this.async()
+        setTimeout(() => {
+          grunt.task.run('foo')
+          // 异步结束之后调用done
+          done()
+        }, 1000);
+      })
+    ```
+
+  - 任务执行失败
+    ```js
+      // 怎么让任务执行失败  registerTask的回调函数返回false
+      grunt.registerTask('err-task', () => {
+        console.log('err-task-message')
+        return false
+      })
+    ```
+#### &#x1F4DA; Gulp使用
+  - 定义任务
+    ```js
+      exports.foo = done => {
+        console.log(123)
+        done()
+      }
+    ```
+    ```txt
+      npm install gulp-cli -g
+      gulp foo
+    ```
+
+  - 可以返回Promise来判断任务执行是否成功
+    ```js
+      // promise的状态也可以作为返回值返回 去作为任务的返回对象
+      exports.promise = () => {
+        console.log('promise task')
+        return Promise.resolve()
+      }
+    ```
+
+  - 异步任务
+    ```js
+      const timeout = time => {
+        return new Promise(resolve => {
+          setTimeout(resolve, time)
+        })
+      }
+
+      exports.async = async () => {
+        await timeout(1000)
+        console.log('async task')
+      }
+    ```
+  
+  - process
+    ```js
+      const fs = require('fs')
+      const { Transform } = require('stream')
+
+      exports.default = () => {
+        // 文件读取流
+        const readStream = fs.createReadStream('normalize.css')
+
+        // 文件写入流
+        const writeStream = fs.createWriteStream('normalize.min.css')
+
+        //  转换流
+        const transformStream = new Transform({
+          // 核心转换过程
+          transform: (chunk, encoding, callback) => {
+            // 当前文件流转换为string
+            const input = chunk.toString()
+            const output = input.replace(/\s+/g, '').replace(/\/\*.+?\*\//g, '')
+            // 错误优先的回调函数
+            callback(null, output)
+          }
+        })
+        return readStream
+          .pipe(transformStream) // 转换
+          .pipe(writeStream) // 写入
+      }
+    ```
+
+  - 文件流操作
+    ```js
+      const { src, dest }  = require('gulp')
+      const style = () => {
+        // 读取流
+        return src('src/assets/styles/*.scss', { base: 'src' })
+          // 将未换行的括号换行 用对应的插件处理流
+          .pipe(plugins.sass({ outputStyle: 'expanded' }))
+          // 流处理操作的结果文件
+          .pipe(dest('temp'))
+      }
+      module.exports = {
+        style
+      }
+    ```
+    ```
+    ```
+
+  - 串行任务/并行任务
+    - series 串行
+      ```js
+        const { src, dest, series }  = require('gulp')
+        const style = () => {
+          // 读取流
+          return src('src/assets/styles/*.scss', { base: 'src' })
+            // 将未换行的括号换行 用对应的插件处理流
+            .pipe(plugins.sass({ outputStyle: 'expanded' }))
+            // 流处理操作的结果文件
+            .pipe(dest('temp'))
+        }
+
+        const script = () => {
+          return src('src/assets/scripts/*.js', { base: 'src' })
+            // 你得告诉他用什么去处理
+            .pipe(plugins.babel({ presets: ['@babel/preset-env'] }))
+            .pipe(dest('temp'))
+            // 这里可以在下面直接bs配置中使用files直接监视文件改变  但是这里为了减少开销 在这里使用流的方式给浏览器
+            .pipe(bs.reload({ stream: true }))
+        }
+        // 串行 先执行style 再执行script
+        const foo = series(style, script)
+
+        module.exports = {
+          foo
+        }
+      ```
+    - parallel 并行
+      ```js
+        const { src, dest, parallel }  = require('gulp')
+        const style = () => {
+          // 读取流
+          return src('src/assets/styles/*.scss', { base: 'src' })
+            // 将未换行的括号换行 用对应的插件处理流
+            .pipe(plugins.sass({ outputStyle: 'expanded' }))
+            // 流处理操作的结果文件
+            .pipe(dest('temp'))
+        }
+
+        const script = () => {
+          return src('src/assets/scripts/*.js', { base: 'src' })
+            // 你得告诉他用什么去处理
+            .pipe(plugins.babel({ presets: ['@babel/preset-env'] }))
+            .pipe(dest('temp'))
+            // 这里可以在下面直接bs配置中使用files直接监视文件改变  但是这里为了减少开销 在这里使用流的方式给浏览器
+            .pipe(bs.reload({ stream: true }))
+        }
+        // 并行执行
+        const foo = parallel(style, script)
+
+        module.exports = {
+          foo
+        }
+      ```
