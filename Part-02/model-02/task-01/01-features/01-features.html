@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+
+
+  <!-- 通过给script标签 添加type="module" 属性 就可以以ESmodule的标准去执行代码 -->
+  <script type="module">
+    console.log('this is es module')
+  </script>
+
+  <!-- 1. 默认采用严格模式执行  忽略 'use strict'的声明 -->
+  <script type="module">
+    console.log(this)
+  </script>
+  <script>
+    console.log(this)
+  </script>
+
+  <!-- 2. 每个ES Module 都是单独的私有作用域 -->
+  <script type="module">
+    var foo = 1
+  </script>
+  <script>
+    console.log(foo)
+  </script>
+
+  <!-- 3. ESM 是通过 CORS 的方式请求外部 JS 模块的 -->
+  <!-- 部分外链请求会跨域被浏览器拦截 -->
+  <!-- script module 必须在serve环境去运行 直接打开文件运行不起作用 -->
+
+  <!-- 4. ESM 的 script 标签会延迟执行  等待当前浏览器DOM渲染之后执行 -->
+  <!-- 类似 defer -->
+  <script type="module">
+    alert(1)
+  </script>
+  <script defer>
+    alert(2)
+  </script>
+  <p>你好</p>
+</body>
+</html>
