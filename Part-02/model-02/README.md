@@ -276,3 +276,120 @@
       }
     }
   ```
+
+#### &#x1F4DA; Webpack 资源模块加载
+  - webpack是整个前端的打包工具，可以打包任意类型的文件
+  - 通过各种loader实现
+    ```js
+      // webpack.config.js   node 环境
+    const path = require('path')
+
+    module.exports = {
+      mode: 'none',
+      entry: './src/main.js',
+      output: {
+        filename: 'bundle.js',
+        path: path.join(__dirname, 'output')
+      },
+      module: {
+        rules: [
+          {
+            // 匹配类型文件
+            test: /.css$/,
+            // css-loader 的作用是处理css文件 将css代码打包让js处理 但是单独的css-loader只是打包处理 并没有引入
+            // 所以又需要一个loader style-loader 
+            // style-loader 通过style标签将css挂载到HTML中
+            // 多个loader执行的时候从后往前执行 css-loader  ->  style-loader
+            use: [
+              'style-loader',
+              'css-loader'
+            ] 
+          }
+        ]
+      }
+    }
+    ```
+#### &#x1F4DA; Webpack 导入资源模块
+  - 通过源码可以看到css也是通过js导入到项目的
+  - 根据代码的需要动态的导入资源
+  - 用js去驱动整个前端的业务功能
+#### &#x1F4DA; Webpack 文件资源加载器
+  - 加载一些image font 等 需要文件资源加载器
+  - file-loader
+    ```js
+      const path = require('path')
+      module.exports = {
+        mode: 'none',
+        entry: './scr/main.js',
+        output: {
+          filename: 'bundle.js',
+          path: path.join(__dirname, 'output'),
+          publicPath: 'dist/' // 绝对路径  后面要加 / !!!!!!!!!!!
+        },
+        // 正常这样处理之后 文件中加载图片是去网站根目录去找图片的 正确地址在dist文件下 
+        // 所以需要在output中设置告诉webpack打包之后的文件存放在哪
+        module: {
+          rules: [
+            {
+              test: /.png$/',
+              use: 'file-loader'
+            }
+          ]
+        }
+      }
+    ```
+
+#### &#x1F4DA; Webpack URL 加载器
+  - 加载webpack中的文件 也可以使用url-loader 
+  - url-loader 是使用Data URLs
+  - Data URLs 是一种特殊得URL协议 可以用来表示任意文件  处理过后是
+  - ![Image text](../image/image-07.jpg)
+  - 也可以通过base64去处理
+  - 最佳实践
+    - 小文件 一般小于10KB 减少请求次数
+    - 大文件单独提取处理还是使用file-loader去处理
+    - 像下面的设置就是超过10KB的文件会按照file-loader去处理 处理文件单独存放和之前单独使用file-loader一样
+    - 而小于10KB的文件会被处理成Data URLs嵌入代码当中
+    ```js
+      const path = require('path')
+      module.exports = {
+        mode: 'none',
+        entry: './scr/main.js',
+        output: {
+          filename: 'bundle.js',
+          path: path.join(__dirname, 'output'),
+          publicPath: 'dist/' // 绝对路径  后面要加 / !!!!!!!!!!!
+        },
+        // 正常这样处理之后 文件中加载图片是去网站根目录去找图片的 正确地址在dist文件下 
+        // 所以需要在output中设置告诉webpack打包之后的文件存放在哪
+        module: {
+          rules: [
+            {
+              test: /.png$/',
+              // use: 'url-loader',
+              use: {
+                loader: 'url-loader',
+                options: {
+                  limit: 10 * 1024 // 10KB  当文件大于10KB的时候自动去使用file-loader去处理文件  小于10KB的时候还是使用url-loader去处理
+                  // 要想这样使用开发环境必须安装 file-loader 这里是url-loader内部去自动调用了file-loader
+                }
+              }
+            }
+          ]
+        }
+      }
+    ```
+#### &#x1F4DA; Webpack 常用加载器分类
+  - 编译转换类
+    - 会将加载的资源模块 转换为js代码
+    - css-loader  将 css  转换为 以js形式工作的css模块
+  
+  - 文件操作类
+    - 将文件拷贝到输出目录 同时将文件向外导出
+    - file-loader
+  
+  - 代码质量检查类
+    - 统一代码风格 提高代码质量
+    - eslint-loader
+  
+  - 在后续接触的loader先了解类型是什么 作用 特点 是什么 使用需要注意什么 能干嘛
