@@ -209,3 +209,70 @@
     但是这样commonJS 规范就不能使用了  
     想要使用的话就需要将common.js  改为 common.cjs去执行
   ```
+
+### &#x1F47E; Webpack 打包
+#### &#x1F4DA; 模块打包工具的由来
+  - ES Module存在环境问题
+  - 模块化文件过多 网络请求频繁
+  - 不仅仅js需要模块
+    ```txt
+      所以就有了这样的想法 
+      能使用模块化开发 并且能兼容各种环境运行
+    ```
+  - ![Image text](../image/image-06.jpg)
+
+
+#### &#x1F4DA; 模块打包工具概要
+  - webpack
+    - 模块打包器 使用loader去处理代码兼容问题
+    - 模块拆分(Code Splitting) 解决文件大的问题 实现增量加载(动态加载)
+    - 资源模块(Asset Module) 其他类型的文件
+    - 整个对前端项目的模块化 并不用担心环境的因素
+    
+#### &#x1F4DA; Webpack 快速上手
+  - npm install webpack webpack-cli -g
+  - webpack
+  - 会默认找到index.js 打包
+  - 之后可以将执行命令添加到package的script当中
+
+#### &#x1F4DA; Webpack 快速上配置文件
+  ```js
+    // webpack.config.js   node 环境
+    const path = require('path')
+    module.exports = {
+      // 入口
+      entry: './src/main.js',
+      // 出口
+      output: {
+        // 打包之后文件名
+        filename: 'bundle.js',
+        // 打包之后路径  就会在当前目录output下面打包
+        path: path.join(__dirname, 'output')
+      }
+    }
+  ```
+
+#### &#x1F4DA; Webpack 工作模式
+  ```js
+    // webpack.config.js   node 环境
+    const path = require('path')
+    module.exports = {
+      // 工作模式
+      // 1. production 代码压缩 优化打包结果
+      // 2. developme 优化打包速度 添加一些调试的辅助代码
+      // 3. none 最原始状态的打包  不做任何处理
+      // 具体差异可以在官网找到
+      // 然后可以通过执行命令的时候动态传入
+      // webpack --mode development
+      mode: 'development',
+      // 入口
+      entry: './src/main.js',
+      // 出口
+      output: {
+        // 打包之后文件名
+        filename: 'bundle.js',
+        // 打包之后路径  就会在当前目录output下面打包
+        path: path.join(__dirname, 'output')
+      }
+    }
+  ```
