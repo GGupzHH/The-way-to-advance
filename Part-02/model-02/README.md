@@ -495,3 +495,46 @@
     - 自动在打包之前清除上一次打包结果
     - 拷贝不需要处理的文件
     - 压缩
+  
+#### &#x1F4DA; Webpack 自动清除输出目录插件
+  - clean-webpack-plugin
+    ```js
+      const path = require('path')
+      const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+
+      module.exports = {
+        mode: 'none',
+        entry: './src/main.js',
+        output: {
+          filename: 'bundle.js',
+          path: path.join(__dirname, 'temp'),
+        },
+        module: {
+          rules: [
+            {
+              test: /.md$/,
+              use: [
+                'html-loader',
+                './markeddown-loader'
+              ]
+            }
+          ]
+        },
+        plugins: [
+          // 经过测试   会默认删除output配置的打包目录
+          new CleanWebpackPlugin()
+        ]
+      }
+    ```
+
+#### &#x1F4DA; Webpack 自动生成HTML插件（上）
+
+#### &#x1F4DA; Webpack 自动生成HTML插件（中）
+
+#### &#x1F4DA; Webpack 自动生成HTML插件（下）
+
+#### &#x1F4DA; Webpack 插件使用总结
+
+#### &#x1F4DA; Webpack 开发一个插件
+
+#### &#x1F4DA; Webpack 开发体验问题
