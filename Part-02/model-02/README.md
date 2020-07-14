@@ -487,3 +487,237 @@
     - 可以使用json.stringify将HTML转义(json 会将符号等一些转义)之后导出
     - 可以使用别得loader处理  使用html-loader 
     - 但是要注意loader执行顺序  先是marked-loader处理 之后是html-loader处理
+
+
+#### &#x1F4DA; Webpack 插件机制介绍
+  - loader 解决项目资源加载的问题
+  - plugin 增强项目自动化的能力
+    - 自动在打包之前清除上一次打包结果
+    - 拷贝不需要处理的文件
+    - 压缩
+  
+#### &#x1F4DA; Webpack 自动清除输出目录插件
+  - clean-webpack-plugin
+    ```js
+      const path = require('path')
+      const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+
+      module.exports = {
+        mode: 'none',
+        entry: './src/main.js',
+        output: {
+          filename: 'bundle.js',
+          path: path.join(__dirname, 'temp'),
+        },
+        module: {
+          rules: [
+            {
+              test: /.md$/,
+              use: [
+                'html-loader',
+                './markeddown-loader'
+              ]
+            }
+          ]
+        },
+        plugins: [
+          // 经过测试   会默认删除output配置的打包目录
+          new CleanWebpackPlugin()
+        ]
+      }
+    ```
+
+#### &#x1F4DA; Webpack 自动生成HTML插件（上）
+  ```js
+    const path = require('path')
+    const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+    // 可以使用这个插件  直接再dist默认生成一个引用了打包入口文件的HTML
+    const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+    module.exports = {
+      mode: 'none',
+      entry: './src/main.js',
+      output: {
+        filename: 'bundle.js',
+        path: path.join(__dirname, 'dist'),
+      },
+      module: {
+        rules: [
+          {
+            test: /.md$/,
+            use: [
+              'html-loader',
+              './markeddown-loader'
+            ]
+          }
+        ]
+      },
+      plugins: [
+        new CleanWebpackPlugin(),
+        new HtmlWebpackPlugin()
+      ]
+    }
+
+  ```
+
+#### &#x1F4DA; Webpack 自动生成HTML插件（中）
+  - 可以通过这个插件给生成的HTML设置一些传入HTML
+  - 如果需要大量自定义的配置 还是去编辑一个HTML模板
+  ```js
+    const path = require('path')
+    const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+    const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+    const path = require('path')
+    const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+    const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+    module.exports = {
+      mode: 'none',
+      entry: './src/main.js',
+      output: {
+        filename: 'bundle.js',
+        path: path.join(__dirname, 'dist'),
+      },
+      module: {
+        rules: [
+          {
+            test: /.md$/,
+            use: [
+              'html-loader',
+              './markeddown-loader'
+            ]
+          }
+        ]
+      },
+      plugins: [
+        new CleanWebpackPlugin(),
+        new HtmlWebpackPlugin({
+          title: 'Webpack Plugins Sample',
+          meta: {
+            viewprot: 'width=device-width'
+          },
+          // 定义模板文件路径 HTML模板中可以使用<%= htmlWebpackPlugin.options.title %> 去或得一些数据
+          template: './src/index.html'
+        })
+      ]
+    }
+
+  ```
+  ```html
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Webpack Plugins Sample</title>
+      <meta name="viewprot" content="width=device-width"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
+      <body>
+        <div class="box-wrapper">
+          <%= htmlWebpackPlugin.options.title %>
+        </div>
+      <script src="bundle.js"></script></body>
+    </html>
+  ```
+
+#### &#x1F4DA; Webpack 自动生成HTML插件（下）
+  - 默认创建的HTML是index.html
+  - 多页面创建多个html 
+    ```js
+      const path = require('path')
+      const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+      const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+      module.exports = {
+        mode: 'none',
+        entry: './src/main.js',
+        output: {
+          filename: 'bundle.js',
+          path: path.join(__dirname, 'dist'),
+        },
+        module: {
+          rules: [
+            {
+              test: /.md$/,
+              use: [
+                'html-loader',
+                './markeddown-loader'
+              ]
+            }
+          ]
+        },
+        plugins: [
+          new CleanWebpackPlugin(),
+          // 默认创建index.html
+          new HtmlWebpackPlugin({
+            title: 'Webpack Plugins Sample',
+            meta: {
+              viewprot: 'width=device-width'
+            },
+            // 定义模板文件路径 HTML模板中可以使用<%= htmlWebpackPlugin.options.title %> 去或得一些数据
+            template: './src/index.html'
+          }),
+          // 可以创建多个HTML页面 适用于多页面应用
+          new HtmlWebpackPlugin({
+            filename: 'temp.html'
+          })
+        ]
+      }
+
+    ```
+
+#### &#x1F4DA; Webpack 插件使用总结
+  - 对于一些公共的文件我们直接可以复制到dist文件中
+  - copy-webpack-plugin
+    ```js
+      const path = require('path')
+      const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+      const HtmlWebpackPlugin = require('html-webpack-plugin')
+      const CopyWebpackPlugin = require('copy-webpack-plugin')
+
+      module.exports = {
+        mode: 'none',
+        entry: './src/main.js',
+        output: {
+          filename: 'bundle.js',
+          path: path.join(__dirname, 'dist'),
+        },
+        module: {
+          rules: [
+            {
+              test: /.md$/,
+              use: [
+                'html-loader',
+                './markeddown-loader'
+              ]
+            }
+          ]
+        },
+        plugins: [
+          new CleanWebpackPlugin(),
+          // 默认创建index.html
+          new HtmlWebpackPlugin({
+            title: 'Webpack Plugins Sample',
+            meta: {
+              viewprot: 'width=device-width'
+            },
+            // 定义模板文件路径 HTML模板中可以使用<%= htmlWebpackPlugin.options.title %> 去或得一些数据
+            template: './src/index.html'
+          }),
+          // 可以创建多个HTML页面 适用于多页面应用
+          new HtmlWebpackPlugin({
+            filename: 'temp.html'
+          }),
+          // 将制定目录文件复制到dist下面
+          new CopyWebpackPlugin({
+            patterns: [
+              { from: 'image', to: '.' },
+              { from: 'image', to: 'image' }
+            ],
+          })
+        ]
+      }
+
+    ```
+#### &#x1F4DA; Webpack 开发一个插件
+
+#### &#x1F4DA; Webpack 开发体验问题
