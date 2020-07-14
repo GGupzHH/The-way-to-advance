@@ -1,6 +1,7 @@
 const path = require('path')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
   mode: 'none',
@@ -34,6 +35,13 @@ module.exports = {
     // 可以创建多个HTML页面 适用于多页面应用
     new HtmlWebpackPlugin({
       filename: 'temp.html'
+    }),
+    // 将制定目录文件复制到dist下面
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'image', to: '.' },
+        { from: 'image', to: 'image' }
+      ],
     })
   ]
 }
