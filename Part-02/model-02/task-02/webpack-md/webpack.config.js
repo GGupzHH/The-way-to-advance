@@ -1,5 +1,6 @@
 const path = require('path')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   mode: 'none',
@@ -20,6 +21,19 @@ module.exports = {
     ]
   },
   plugins: [
-    new CleanWebpackPlugin()
+    new CleanWebpackPlugin(),
+    // 默认创建index.html
+    new HtmlWebpackPlugin({
+      title: 'Webpack Plugins Sample',
+      meta: {
+        viewprot: 'width=device-width'
+      },
+      // 定义模板文件路径 HTML模板中可以使用<%= htmlWebpackPlugin.options.title %> 去或得一些数据
+      template: './src/index.html'
+    }),
+    // 可以创建多个HTML页面 适用于多页面应用
+    new HtmlWebpackPlugin({
+      filename: 'temp.html'
+    })
   ]
 }

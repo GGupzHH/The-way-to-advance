@@ -528,10 +528,142 @@
     ```
 
 #### &#x1F4DA; Webpack 自动生成HTML插件（上）
+  ```js
+    const path = require('path')
+    const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+    // 可以使用这个插件  直接再dist默认生成一个引用了打包入口文件的HTML
+    const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+    module.exports = {
+      mode: 'none',
+      entry: './src/main.js',
+      output: {
+        filename: 'bundle.js',
+        path: path.join(__dirname, 'dist'),
+      },
+      module: {
+        rules: [
+          {
+            test: /.md$/,
+            use: [
+              'html-loader',
+              './markeddown-loader'
+            ]
+          }
+        ]
+      },
+      plugins: [
+        new CleanWebpackPlugin(),
+        new HtmlWebpackPlugin()
+      ]
+    }
+
+  ```
 
 #### &#x1F4DA; Webpack 自动生成HTML插件（中）
+  - 可以通过这个插件给生成的HTML设置一些传入HTML
+  - 如果需要大量自定义的配置 还是去编辑一个HTML模板
+  ```js
+    const path = require('path')
+    const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+    const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+    const path = require('path')
+    const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+    const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+    module.exports = {
+      mode: 'none',
+      entry: './src/main.js',
+      output: {
+        filename: 'bundle.js',
+        path: path.join(__dirname, 'dist'),
+      },
+      module: {
+        rules: [
+          {
+            test: /.md$/,
+            use: [
+              'html-loader',
+              './markeddown-loader'
+            ]
+          }
+        ]
+      },
+      plugins: [
+        new CleanWebpackPlugin(),
+        new HtmlWebpackPlugin({
+          title: 'Webpack Plugins Sample',
+          meta: {
+            viewprot: 'width=device-width'
+          },
+          // 定义模板文件路径 HTML模板中可以使用<%= htmlWebpackPlugin.options.title %> 去或得一些数据
+          template: './src/index.html'
+        })
+      ]
+    }
+
+  ```
+  ```html
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Webpack Plugins Sample</title>
+      <meta name="viewprot" content="width=device-width"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
+      <body>
+        <div class="box-wrapper">
+          <%= htmlWebpackPlugin.options.title %>
+        </div>
+      <script src="bundle.js"></script></body>
+    </html>
+  ```
 
 #### &#x1F4DA; Webpack 自动生成HTML插件（下）
+  - 默认创建的HTML是index.html
+  - 多页面创建多个html 
+    ```js
+      const path = require('path')
+      const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+      const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+      module.exports = {
+        mode: 'none',
+        entry: './src/main.js',
+        output: {
+          filename: 'bundle.js',
+          path: path.join(__dirname, 'dist'),
+        },
+        module: {
+          rules: [
+            {
+              test: /.md$/,
+              use: [
+                'html-loader',
+                './markeddown-loader'
+              ]
+            }
+          ]
+        },
+        plugins: [
+          new CleanWebpackPlugin(),
+          // 默认创建index.html
+          new HtmlWebpackPlugin({
+            title: 'Webpack Plugins Sample',
+            meta: {
+              viewprot: 'width=device-width'
+            },
+            // 定义模板文件路径 HTML模板中可以使用<%= htmlWebpackPlugin.options.title %> 去或得一些数据
+            template: './src/index.html'
+          }),
+          // 可以创建多个HTML页面 适用于多页面应用
+          new HtmlWebpackPlugin({
+            filename: 'temp.html'
+          })
+        ]
+      }
+
+    ```
 
 #### &#x1F4DA; Webpack 插件使用总结
 
