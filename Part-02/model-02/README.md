@@ -379,6 +379,7 @@
         }
       }
     ```
+
 #### &#x1F4DA; Webpack 常用加载器分类
   - 编译转换类
     - 会将加载的资源模块 转换为js代码
@@ -393,3 +394,38 @@
     - eslint-loader
   
   - 在后续接触的loader先了解类型是什么 作用 特点 是什么 使用需要注意什么 能干嘛
+
+#### &#x1F4DA; Webpack 与 ES 2015
+  - Webpack需要对模块进行打包， 所以默认会将import export做一些转换，但是并不能转换代码当中其他的ES6特性
+  - 如果我们需要处理ES6 则需要另一个loader
+  - npm install babel-loader @babel/core @babel/preset-env -d
+    ```js
+      module.exports = {
+        mode: 'none',
+        entry: '',
+        output: {
+          filename: '',
+          path: '',
+          publicPath: ''
+        },
+        module: {
+          rules: [
+            {
+              test: /.js$/,
+              // 这样写可以发现ES6并没有被处理
+              //  因为babel 是一个代码转换的平台  我们得指定这个平台使用什么插件去处理代码
+              // use: 'babel-loader',
+              // 下面是正确配置插件方式 配置单独的加载器去实现
+              use: {
+                loader: 'babel-loader',
+                options: ['@babel/preset-env']
+              }
+            }
+          ]
+        }
+      }
+    ```
+
+#### &#x1F4DA; Webpack 加载资源的方式
+#### &#x1F4DA; Webpack 核心工作原理
+#### &#x1F4DA; Webpack 开发一个 Loader
