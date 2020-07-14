@@ -487,3 +487,11 @@
     - 可以使用json.stringify将HTML转义(json 会将符号等一些转义)之后导出
     - 可以使用别得loader处理  使用html-loader 
     - 但是要注意loader执行顺序  先是marked-loader处理 之后是html-loader处理
+
+
+#### &#x1F4DA; Webpack 插件机制介绍
+  - loader 解决项目资源加载的问题
+  - plugin 增强项目自动化的能力
+    - 自动在打包之前清除上一次打包结果
+    - 拷贝不需要处理的文件
+    - 压缩
