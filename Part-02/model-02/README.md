@@ -379,6 +379,7 @@
         }
       }
     ```
+
 #### &#x1F4DA; Webpack 常用加载器分类
   - 编译转换类
     - 会将加载的资源模块 转换为js代码
@@ -393,3 +394,96 @@
     - eslint-loader
   
   - 在后续接触的loader先了解类型是什么 作用 特点 是什么 使用需要注意什么 能干嘛
+
+#### &#x1F4DA; Webpack 与 ES 2015
+  - Webpack需要对模块进行打包， 所以默认会将import export做一些转换，但是并不能转换代码当中其他的ES6特性
+  - 如果我们需要处理ES6 则需要另一个loader
+  - npm install babel-loader @babel/core @babel/preset-env -d
+    ```js
+      module.exports = {
+        mode: 'none',
+        entry: '',
+        output: {
+          filename: '',
+          path: '',
+          publicPath: ''
+        },
+        module: {
+          rules: [
+            {
+              test: /.js$/,
+              // 这样写可以发现ES6并没有被处理
+              //  因为babel 是一个代码转换的平台  我们得指定这个平台使用什么插件去处理代码
+              // use: 'babel-loader',
+              // 下面是正确配置插件方式 配置单独的加载器去实现
+              use: {
+                loader: 'babel-loader',
+                options: ['@babel/preset-env']
+              }
+            }
+          ]
+        }
+      }
+    ```
+
+#### &#x1F4DA; Webpack 加载资源的方式
+  - 除了import能触发文件的加载 还有别的也可以触发加载文件
+    - 遵循 ESModules 标准的 import 声明
+    - 遵循 CommonJS 标准的 require 声明
+    - 遵循 AMD 标准的 define 函数和 require 声明
+      - 但是不要在一个项目中混入不同的标准
+    - 样式代码中 @import 和 ulr()
+    - html 代码中的图片标签和scr属性
+    - 最后将用到的文件打包到输出目录
+
+  - loader加载非js 也会触发资源加载
+    - @import @import url()
+    - url 函数 background-image: url();
+    - src 属性 html 的 img 也会触发文件资源加载
+    - a href  webpack 默认只处理HTML中的src属性 不会处理href想要处理需要配置html-loader
+
+  - html-loader
+    - npm install html-loader -d
+    ```js
+      module.exports = {
+        mode: 'none',
+        entry: '',
+        output: {
+          filename: '',
+          path: '',
+          publicPath: ''
+        },
+        module: {
+          rules: [
+            {
+              test: /.html$/,
+              use: {
+                loader: 'html-loader',
+                options: {
+                  // 'img:src' 是默认就存在的   默认处理img加载的文件  
+                  // 如果需要加载 a 标签 href加载的文件 我们需要告诉html-loader 去处理这样的文件
+                  attrs: ['img:src', 'a:href']
+                }
+              }
+            }
+          ]
+        }
+      }
+    ```
+#### &#x1F4DA; Webpack 核心工作原理
+  - loader 机制是webpack的核心
+  - ![Image text](../image/image-08.jpg)
+
+#### &#x1F4DA; Webpack 开发一个 Loader
+  - 开发一个处理md文件的loader
+  - loader要求我们对输入的文件进行处理
+  - 处理结果必须是一段js代码
+  - webpack.config.js 中使用自己定义的loader
+  - ![Image text](../image/image-09.jpg)
+  - 我们可以使用多个loader(加载器去处理 只要最后返回js就OK)
+  - ![Image text](../image/image-10.jpg)
+  - loader就是负责资源文件从输入到输出的转换
+  - 先用marked-loader 处理 md 转换为 HTML 
+    - 可以使用json.stringify将HTML转义(json 会将符号等一些转义)之后导出
+    - 可以使用别得loader处理  使用html-loader 
+    - 但是要注意loader执行顺序  先是marked-loader处理 之后是html-loader处理
