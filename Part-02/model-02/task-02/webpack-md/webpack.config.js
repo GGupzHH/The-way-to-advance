@@ -35,13 +35,17 @@ class MyPlugin {
     console.log('Myplugin 启动')
   }
 }
-
 module.exports = {
   mode: 'none',
   entry: './src/main.js',
   output: {
     filename: 'bundle.js',
     path: path.join(__dirname, 'dist'),
+  },
+  // 配置 webpack-dev-serve
+  devServer: {
+    // 指定公共目录
+    contentBase: './image'
   },
   module: {
     rules: [
@@ -69,7 +73,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: 'temp.html'
     }),
-    // 将制定目录文件复制到dist下面
+    // 将制定目录文件复制到dist下面  这个插件一般在上线前一次在使用 因为是直接copy文件
     new CopyWebpackPlugin({
       patterns: [
         { from: 'image', to: '.' },

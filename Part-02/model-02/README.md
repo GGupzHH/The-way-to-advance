@@ -783,12 +783,19 @@
 #### &#x1F4DA; Webpack Dev Server
   - 是官方提出的开发工具
   - 自动编译  自动刷新  自动监听
-  - npm install webpack-dev-serve
-  - 启动 webpack-dev-serve
+  - npm install webpack-dev-server
+  - 启动 webpack-dev-server
   - 并不会将打包结果输出  而是存放到内存当中  减少大量内存开销
   - webpack-dev-serve --open 自动打开浏览器
 
 #### &#x1F4DA; Webpack Dev Server 静态资源访问
+  - 其他静态资源也需要加载
+    ```js
+      devServer: {
+        // 指定公共目录  配置公共资源  额外的资源路径
+        contentBase: './image'
+      }
+    ```
 
 #### &#x1F4DA; Webpack Dev Server 代理 API
 
