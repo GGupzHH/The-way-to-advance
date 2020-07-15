@@ -6,7 +6,6 @@ module.exports = source => {
 
   // 方法1  先使用marked-loader 处理成 html 使用json.stringify去处理字符
   const html = marked(source)
-  console.log(html)
   // html 当中的符号会报错
   // return `module.exports = '${html}'`
   

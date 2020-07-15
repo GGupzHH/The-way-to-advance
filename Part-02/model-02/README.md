@@ -719,5 +719,140 @@
 
     ```
 #### &#x1F4DA; Webpack 开发一个插件
+  - webpack是内置各种钩子函数的 在钩子函数中处理数据
+    - 必须是一个函数 包含apply方法的对象
+    - 一般定义一个类
+  - 实现
+    ```js
+      class MyPlugin {
+        apply(compiler) {
+          // compiler 包含了webpack配置对象的信息和各种钩子函数 
+          // 这个插件去处理打包之后的注释
+          // 明确插件需要执行的时机
+          // console.log(compiler.hooks.emit)
+
+          // https://www.webpackjs.com/api/plugins/
+          // emit 在文件打包之前执行的钩子函数
+          compiler.hooks.emit.tap('MyPlugin', compilation => {
+            // compilation此次打包的上下文
+            // console.log(compilation)
+            for (let name in compilation.assets) {
+              // assets存储的是文件  是一个对象  assets是文件名
+              // 获取文件内容
+              // compilation.assets[name].source()
+              // 判断是否是js文件
+              if(name.endsWith('.js')) {
+                const contents = compilation.assets[name].source()
+                const withoutComments = contents.replace(/\/\*\*+\*\//g, '')
+                // 然后将处理之后的内容再放入对应的文件名中
+                compilation.assets[name] = {
+                  source: () => withoutComments,
+                  // 将内容和内容长度存入  webpack要求这样写
+                  size: () => withoutComments.length
+                }
+              }
+            }
+          })
+          console.log('Myplugin 启动')
+        }
+      }
+    ```
 
 #### &#x1F4DA; Webpack 开发体验问题
+  - 目前我们的学习远远不够
+  - 将来要做什么
+    - 能够使用HTTP服务去运行  更大程度的模拟生产环境
+    - 自动编译  自动刷新  热更新
+    - 提供Source Map支持 根据提供的错误堆栈信息去定义源码的错误
+
+#### &#x1F4DA; Webpack 自动编译
+  - watch工作模式
+  - 监听文件变化，自动打包
+  - webpack --watch
+  - 就会以监视模式工作 打包之cli不会退出 等待文件的修改 当文件修改之后 cli再次处理
+
+#### &#x1F4DA; Webpack 自动刷新浏览器
+  - BrowserSync
+  - 全局安装
+  - 在dist文件下启动服务 监视dist文件下的文件改变
+  - browser-sync dist --files "**/*"
+  - 弊端
+    - 操作麻烦
+    - 效率降低 webpack写入磁盘 BrowserSync再去磁盘读取
+
+#### &#x1F4DA; Webpack Dev Server
+  - 是官方提出的开发工具
+  - 自动编译  自动刷新  自动监听
+  - npm install webpack-dev-server
+  - 启动 webpack-dev-server
+  - 并不会将打包结果输出  而是存放到内存当中  减少大量内存开销
+  - webpack-dev-serve --open 自动打开浏览器
+
+#### &#x1F4DA; Webpack Dev Server 静态资源访问
+  - 其他静态资源也需要加载
+    ```js
+      devServer: {
+        // 指定公共目录  配置公共资源  额外的资源路径
+        contentBase: './image'
+      }
+    ```
+
+#### &#x1F4DA; Webpack Dev Server 代理 API
+  ```js
+    // 如果没写module.exports = {}  说明这个对象是直接在最外面的属性 就和entry一样
+    devServer: {
+      // 指定公共目录  配置公共资源  额外的资源路径
+      contentBase: './image',
+      proxy: {
+        // http://locahost:8080/api/user   -> https://api.github.com/api/user
+        '/api': {
+          target: 'https://api.github.com',
+          // https://api.github.com/api/user   ->  https://api.github.com/user
+          pathRewrite: {
+            '^/api': ''
+          },
+          // 不能使用  locahost:8080 作为主机名 github服务器会对主机名解析  true就会以实际代理的主机名请求
+          changeOrigin: true
+        }
+      }
+    }
+  ```
+#### &#x1F4DA; Source Map 介绍
+  - 打包之后的代码和源代码的映射
+  - 打包之后的代码通过SourceMap可以逆向解析源代码
+  - map文件构成
+    - version 当前sourceMap使用的版本
+    - sources 源文件的文件名
+    - names 源代码中使用的变量名称
+    - mappings base64-vlq编码   记录的是转换后的字符和转换之前代码的关系
+  - 使用
+    - 在转换之后的文件中通过注释引入
+    - //# sourceMappingURL=xxxxx.min.map
+    - 浏览器会自动加载逆向解析
+
+#### &#x1F4DA; Webpack 配置 Source Map
+  - sourceMap 有很多模式 
+  - devtool
+    ```js
+      // 如果没写module.exports = {}  说明这个对象是直接在最外面的属性 就和entry一样
+      devtool: 'source-map'
+    ```
+  - webpack支持12种 不同的 SourceMap 生成
+  - 每种方式的效果和效率不同
+  - 找错效率越高的  map 文件速度就越慢  找错效率高说明定位准确 所以要生成准确的map文件  所以慢
+#### &#x1F4DA; Webpack eval 模式的 Source Map
+  - ![Image text](../image/image-11.jpg)
+  - eval模式
+    - eval是一个js的函数
+    - eval('console.log(1)') 他会把传入的字符串当做一段代码执行
+  - 实现
+    - devtool: 'eval'
+    - map映射的是打包之后的模块化代码
+    - 因为在打包之后会将我们的源码放在eval函数中执行 并且在eval函数最后通过 sourceURL的方式添加了map文件映射
+    - sourceURL的方式添加了map文件映射  而这个映射会告诉浏览器我们映射的源文件 
+    - 这个过程不会生成SourceMap文件  所以构建速度是最快的
+    
+#### &#x1F4DA; Webpack devtool 模式对比（上）
+#### &#x1F4DA; Webpack devtool 模式对比（下）
+#### &#x1F4DA; Webpack 选择 Source Map 模式
+#### &#x1F4DA; Webpack 自动刷新的问题
