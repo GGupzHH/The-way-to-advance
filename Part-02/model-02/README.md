@@ -719,5 +719,75 @@
 
     ```
 #### &#x1F4DA; Webpack 开发一个插件
+  - webpack是内置各种钩子函数的 在钩子函数中处理数据
+    - 必须是一个函数 包含apply方法的对象
+    - 一般定义一个类
+  - 实现
+    ```js
+      class MyPlugin {
+        apply(compiler) {
+          // compiler 包含了webpack配置对象的信息和各种钩子函数 
+          // 这个插件去处理打包之后的注释
+          // 明确插件需要执行的时机
+          // console.log(compiler.hooks.emit)
+
+          // https://www.webpackjs.com/api/plugins/
+          // emit 在文件打包之前执行的钩子函数
+          compiler.hooks.emit.tap('MyPlugin', compilation => {
+            // compilation此次打包的上下文
+            // console.log(compilation)
+            for (let name in compilation.assets) {
+              // assets存储的是文件  是一个对象  assets是文件名
+              // 获取文件内容
+              // compilation.assets[name].source()
+              // 判断是否是js文件
+              if(name.endsWith('.js')) {
+                const contents = compilation.assets[name].source()
+                const withoutComments = contents.replace(/\/\*\*+\*\//g, '')
+                // 然后将处理之后的内容再放入对应的文件名中
+                compilation.assets[name] = {
+                  source: () => withoutComments,
+                  // 将内容和内容长度存入  webpack要求这样写
+                  size: () => withoutComments.length
+                }
+              }
+            }
+          })
+          console.log('Myplugin 启动')
+        }
+      }
+    ```
 
 #### &#x1F4DA; Webpack 开发体验问题
+  - 目前我们的学习远远不够
+  - 将来要做什么
+    - 能够使用HTTP服务去运行  更大程度的模拟生产环境
+    - 自动编译  自动刷新  热更新
+    - 提供Source Map支持 根据提供的错误堆栈信息去定义源码的错误
+
+#### &#x1F4DA; Webpack 自动编译
+  - watch工作模式
+  - 监听文件变化，自动打包
+  - webpack --watch
+  - 就会以监视模式工作 打包之cli不会退出 等待文件的修改 当文件修改之后 cli再次处理
+
+#### &#x1F4DA; Webpack 自动刷新浏览器
+  - BrowserSync
+  - 全局安装
+  - 在dist文件下启动服务 监视dist文件下的文件改变
+  - browser-sync dist --files "**/*"
+  - 效率降低 webpack写入磁盘 BrowserSync再去磁盘读取
+
+#### &#x1F4DA; Webpack Dev Server
+
+#### &#x1F4DA; Webpack Dev Server 静态资源访问
+
+#### &#x1F4DA; Webpack Dev Server 代理 API
+
+#### &#x1F4DA; Source Map 介绍
+#### &#x1F4DA; Webpack 配置 Source Map
+#### &#x1F4DA; Webpack eval 模式的 Source Map
+#### &#x1F4DA; Webpack devtool 模式对比（上）
+#### &#x1F4DA; Webpack devtool 模式对比（下）
+#### &#x1F4DA; Webpack 选择 Source Map 模式
+#### &#x1F4DA; Webpack 自动刷新的问题
