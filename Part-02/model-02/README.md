@@ -776,9 +776,17 @@
   - 全局安装
   - 在dist文件下启动服务 监视dist文件下的文件改变
   - browser-sync dist --files "**/*"
-  - 效率降低 webpack写入磁盘 BrowserSync再去磁盘读取
+  - 弊端
+    - 操作麻烦
+    - 效率降低 webpack写入磁盘 BrowserSync再去磁盘读取
 
 #### &#x1F4DA; Webpack Dev Server
+  - 是官方提出的开发工具
+  - 自动编译  自动刷新  自动监听
+  - npm install webpack-dev-serve
+  - 启动 webpack-dev-serve
+  - 并不会将打包结果输出  而是存放到内存当中  减少大量内存开销
+  - webpack-dev-serve --open 自动打开浏览器
 
 #### &#x1F4DA; Webpack Dev Server 静态资源访问
 
