@@ -951,3 +951,45 @@
   - 尽量在开发阶段解决问题和bug
 
 #### &#x1F4DA; Webpack 自动刷新的问题
+  - webpack-dev-server
+    - 可以检测到代码的变化 刷新
+  - 问题
+    - 表单等一些输入调试的在刷新的时候没了
+  - 最好的办法就是页面不刷新但是更新模块
+
+#### &#x1F4DA; Webpack HMR 体验
+  - 热更新(最强大  最受欢迎)
+    - 可以在机器上插拔设备 但是不影响极其正常使用
+    - 可以在程序运行中改变指定模块 而不影响其他模块
+
+#### &#x1F4DA; Webpack 开启 HMR
+  - 集成在webpakc-dev-server
+  - 开启
+    - webpack-dev-server --hot 启动热更新
+    - 也可以在配置文件中配置
+      ```js
+        // 但是这样开启之后 css是热更新的  js还是刷新页面更新的 所以这里还是有问题的
+        devServer: {
+          hot: true
+        }
+      ```
+
+#### &#x1F4DA; Webpack HMR 的疑问
+  - 并不是开箱即用
+  - webpack中的HMR 需要手动处理模块热替换逻辑
+  - 样式文件的HMR是style-loader处理的 
+  - 所以我们还是需要手动自己处理HMR
+
+#### &#x1F4DA; Webpack 使用 HMR API
+  - 我们需要在自己的代码中使用 HMR API 处理 
+    ```js
+      import md from './a.md'
+      console.log(md)
+      // 依赖的模块的路径  模块改变的回调
+      module.hot.accept('./a', function() {
+        // 这时候我们修改 a.md 的时候这个回调就会被触发 然后浏览器也不会刷新 因为我们在这里将模块的更新手动处理了
+        // 反之如果我们没有处理  还是会像之前一样浏览器刷新
+        console.log('a更新了')
+      })
+    ```
+
