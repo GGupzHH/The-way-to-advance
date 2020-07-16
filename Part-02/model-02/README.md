@@ -853,6 +853,143 @@
     - 这个过程不会生成SourceMap文件  所以构建速度是最快的
     
 #### &#x1F4DA; Webpack devtool 模式对比（上）
+  - webpack 可以配置多个打包任务 这样就可以一次配置多个任务去进行不同的sourceMap生成 去查看对比
+    ```js
+      const HtmlWebpackPlugin = require('html-webpack-plugin')
+      const path = require('path')
+      const devtool = [ 'source-map', 'eval' ]
+      moudle.exports = devtool.map(item => {
+        return {
+          mode: 'none',
+          entry: './src/main.js',
+          output: {
+            // 将生成的文件都放到js文件下
+            filename: `js/${item}.js`,
+            path: path.join(__dirname, 'dist'),
+          },
+          // 循环定义每一种sourceMap
+          devtool: item,
+          module: {
+            rules: [
+              {
+                // 使用babel/preset-env去将代码转换  使其和源码不同
+                test: /\.js$/,
+                use: {
+                  loader: 'babel-loader',
+                  options: {
+                    presets: ['@babel/preset-env']
+                  }
+                }
+              }
+            ]
+          },
+          // 给每一个js文件都生成一个HTML文件 这样就能在页面中直接运行
+          plugins: [
+            new HtmlWebpackPlugin({
+              filename: `${item}.html`
+            })
+          ]
+        }
+      })
+    ```
+  - 之后利用  serve  工具将起一个服务
+
 #### &#x1F4DA; Webpack devtool 模式对比（下）
+  - 看每一个模式的名字 
+    - cheap 阉割版
+    - module 定位的是模块打包之前的代码 也就是和你写的ES6+ 代码一样的
+
+  - eval 模式
+    - 把代码放到eval函数中执行  并且通过sourceURL去标注文件的路径
+    - 这种模式并没有生成sourceMap 文件 这个模式只能标注哪个文件出错
+  
+  - eval-source-map
+    - 同样是使用eval函数将模块代码放入执行
+    - 但是可以定位文件出错的位置
+    - 生成了sourceMap
+  
+  - cheap-eval-source-map
+    - 是 eval-source-map 的阉割版
+    - 也生成了sourcemap 
+    - 但是只能定位到哪一行出错 速度也会快很多
+
+  - cheap-module-eval-source-map
+    - 也是只能定位到行
+    - 但是和cheap-eval-source-map对比之后发现 
+    - cheap-module-eval-source-map 定义的代码位置是和源码一模一样的
+    - cheap-eval-source-map 定义的是经过ES6转化之后的结果
+
+  - inline-source-map
+    - sourcemap是以物理文件存在的
+    - 使用data:url的方式嵌入到代码当中
+    - 这样会使代码体积变大
+
+  - hidden-source-map
+    - 在开发工具是看不到效果的
+    - 但是本地生成了sourceMap
+    - 是因为打包之后的文件并没有使用注释的方式引入sourceMap
+    - 一般在使用第三方包的时候使用 当第三方包出问题之后引入去定位错误
+  
+  - nosources-source-map
+    - 在浏览器能看到错误出现的位置 但是点击错误信息是看不到源码
+    - 并且可以提示错误出现的行列
+    - 为了能在生产环境保护源码不被暴露
+
+  - 选择一个合适的sourceMap
 #### &#x1F4DA; Webpack 选择 Source Map 模式
+  - 开发环境
+    - cheap-module-source-map
+      - 能定位到行的错误信息就够了
+      - 因为使用框架的原因 转换之后的代码和转换之前的代码差距很大  所以需要module去定位错误发生的位置
+      - 首次打包速度慢可以接受 重写打包速度快
+  
+  - 生产环境
+    - none
+      - 不生成sourceMap
+      - 容易暴露源码
+  
+  - 尽量在开发阶段解决问题和bug
+
 #### &#x1F4DA; Webpack 自动刷新的问题
+  - webpack-dev-server
+    - 可以检测到代码的变化 刷新
+  - 问题
+    - 表单等一些输入调试的在刷新的时候没了
+  - 最好的办法就是页面不刷新但是更新模块
+
+#### &#x1F4DA; Webpack HMR 体验
+  - 热更新(最强大  最受欢迎)
+    - 可以在机器上插拔设备 但是不影响极其正常使用
+    - 可以在程序运行中改变指定模块 而不影响其他模块
+
+#### &#x1F4DA; Webpack 开启 HMR
+  - 集成在webpakc-dev-server
+  - 开启
+    - webpack-dev-server --hot 启动热更新
+    - 也可以在配置文件中配置
+      ```js
+        // 但是这样开启之后 css是热更新的  js还是刷新页面更新的 所以这里还是有问题的
+        devServer: {
+          hot: true
+        }
+      ```
+
+#### &#x1F4DA; Webpack HMR 的疑问
+  - 并不是开箱即用
+  - webpack中的HMR 需要手动处理模块热替换逻辑
+  - 样式文件的HMR是style-loader处理的 
+  - 所以我们还是需要手动自己处理HMR
+
+#### &#x1F4DA; Webpack 使用 HMR API
+  - 我们需要在自己的代码中使用 HMR API 处理 
+    ```js
+      import md from './a.md'
+      console.log(md)
+      // 依赖的模块的路径  模块改变的回调
+      module.hot.accept('./a', function() {
+        // 这时候我们修改 a.md 的时候这个回调就会被触发 然后浏览器也不会刷新 因为我们在这里将模块的更新手动处理了
+        // 反之如果我们没有处理  还是会像之前一样浏览器刷新
+        console.log('a更新了')
+      })
+    ```
+
