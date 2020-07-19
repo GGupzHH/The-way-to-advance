@@ -992,4 +992,192 @@
         console.log('a更新了')
       })
     ```
+#### &#x1F4DA; Webpack 生产环境优化
+  - 不同的生产环境去创建不同的配置
+  - 让我们的打包结果去适用不同的结果
 
+#### &#x1F4DA; Webpack 不同环境下的配置
+  - 配置文件根据环境不同导出不同配置
+    ```js
+      // env当前运行环境变量
+      // argv 所有环境变量
+      module.exports = (env, argv) => {
+        const config = {}  // production 生产环境webpack配置  这里就不写了 
+        if (env === 'production') {
+          // 打包模式
+          config.mode = 'production'
+          // 是否启用SourceMap
+          config.devtool = false
+          config.plugins = [
+            // 将之前的插件解构合并过来
+            ...config.plugins,
+            // 清除上次打包结果
+            new CleanWebpackPlugin(),
+            // copy公共资源到dist
+            new CopyWebpackPlugin(['public'])
+          ]
+        }
+        return config
+      }
+      // webpack --env production
+    ```
+#### &#x1F4DA; Webpack 不同环境的配置文件
+  - 一个环境对应一个配置文件
+  - 一般有三个配置环境文件 两个是不同的环境配置文件  一个是公共的webpack配置
+  - 创建3个配置文件
+    - webpack.common.js
+      ```txt
+        同下
+      ```
+    - webpack.dev.js
+      ```txt
+        同下
+      ```
+    - webpack.prod.js
+      ```js
+        const common = require('./webpack.common.js')
+        const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+        const CopyWebpackPlugin = require('copy-webpack-plugin')
+        // assign这个方法会合并 但是引用类型的会直接替换  不会合并  所以这里我们使用webpack-merge
+        // module.exports = Object.assign({}, common, {
+        //   mode: 'production',
+        //   plugins: [
+        //     // 因为是生产环境  所以这里需要清除上次打包结果和拷贝公共文件
+        //     new CleanWebpackPlugin(),
+        //     // copy公共资源到dist
+        //     new CopyWebpackPlugin(['public'])
+        //   ]
+        // })
+        const merge = require('webpack-merge')
+        module.exports = merge(common, {
+          mode: 'production',
+          plugins: [
+            // 因为是生产环境  所以这里需要清除上次打包结果和拷贝公共文件
+            new CleanWebpackPlugin(),
+            // copy公共资源到dist
+            new CopyWebpackPlugin(['public'])
+          ]
+        })
+      // webpack --config webpack.prod.js
+      ```
+      
+#### &#x1F4DA; Webpack DefinePlugin
+  - 为代码注入全局成员
+  - 默认启用
+  - 注入一个process.env.NODE_ENV
+    ```js
+      const webpack = requrie('webpack')
+      module.exports = {
+        plugins: [
+          new webpack.DefinePlugin({
+            BASE_API: "'https://baidu.com'"
+          })
+        ]
+      }
+      // BASE_API实际上是一个代码片段 
+      // 上面如果不加字符串  就是 一个 未定义的变量  加了字符串符号就是字符串
+      // 这样就可以在文件中直接使用  BASE_API  这个变量了  
+      // 这样就可以注入一些可以变化的值
+    ```
+
+#### &#x1F4DA; Webpack 体验 Tree Shaking
+  - 摇树
+    - 把树上的枯枝败叶摇下来
+  - 而这里我们摇掉的是代码中没有用到东西(未引用代码)
+  - 生产模式下自动启用
+
+#### &#x1F4DA; Webpack 使用 Tree Shaking
+  - 不是某个配置选项
+  - 是一组功能搭配后的优化效果
+  - 生产环境会默认启动
+    ```js
+      module.exports = {
+        // 集中配置webpack内部的一些优化功能的
+        optimization: {
+          usedExports: true, // 标识我们只导出代码中外部使用的   大树中标识未引用的代码
+          miniize: true, // 代码压缩                           摇掉这些冗余代码
+        }
+      }
+    ```
+
+#### &#x1F4DA; Webpack 合并模块
+  - concatenateModules 可以继续优化我们的输出
+  - 尽可能将所有的模块合并输出到一个函数中 既提升了运行效率，又减少了代码的体积
+  - 又被称为 Scope Hoisting  作用域提升
+    ```js
+      module.exports = {
+        // 集中配置webpack内部的一些优化功能的
+        optimization: {
+          usedExports: true, // 标识我们只导出代码中外部使用的   大树中标识未引用的代码
+          concatenateModules: true
+        }
+      }
+    ```
+
+#### &#x1F4DA; Webpack Tree Shaking 与 Babel
+  - 使用 Babel 会使 Webpack Tree Shaking 失效
+  - Webpack Tree Shaking 的实现 前提是 ESModules 也就是webpack打包的代码必须使用ESModules
+  - 而 babel-loader 处理 ESModules  就会处理成CommonJS 当然 这取决于我们有没有使用 babel-loader
+  - 而最新版本的 babel-loader 支持 ESModules  也就是ESModules不会被处理成 CommonJS  这样我们的 Tree Shaking就会生效
+    ```js
+      module.exports = {
+        module: {
+          rules: [
+            {
+              test: /.js$/,
+              use: {
+                loader: 'babel-loader',
+                options: {
+                  presets: [
+                    // 默认为 false  会根据当前环境去处理打包模块化
+                    // 这里我们给 @babel/preset-env 这个打包工具设置模块打包类型为 commonjs 强制将 ESModules 转换为 commonjs  此时 Tree Shaking 就无法正常工作了
+                    ['@babel/preset-env', { modules: 'commonjs' /* false */ }]
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    ```
+#### &#x1F4DA; Webpack sideEffects
+  - v4 以后增加
+  - 标识代码是否有副作用
+  - 模块执行的时候除了导出成员 是否还做了其他事情
+  - 一般在 开发 npm 模块的时候会用到
+    ```js
+      module.exports = {
+        // 依次判断模块去除时候是否有副作用  如果没有副作用就会被去除
+        // 默认在 生产环境中开启
+        // 开启之后会先去package中判断 是否 有 sideEffects的标识
+        // 开启这个功能   package中去清除掉没有副作用的代码
+        sideEffects: true
+      }
+    ```
+  - 这样没有副作用的代码就会被移除掉
+    ```json
+      {
+        "sideEffects": false
+      }
+    ```
+#### &#x1F4DA; Webpack sideEffects 注意
+  - 确定你的代码没有副作用  不然会误删
+  - css导入  或者 基于原型的方法  有些代码只是想让他执行  但是并没有导出对象  这种时候代码会被移除掉
+  - 解决办法
+    - package 中关掉
+    - 设置当前项目中那些文件是有副作用的  设置告诉webpack有副作用的代码   这样代码就会被打包进来了
+      ```js
+      module.exports = {
+        // 依次判断模块去除时候是否有副作用  如果没有副作用就会被去除
+        // 默认在 生产环境中开启
+        // 开启之后会先去package中判断 是否 有 sideEffects的标识
+        // 开启这个功能   package中去清除掉没有副作用的代码
+        sideEffects: [
+          './src/extend.js',
+          '*/*.css'
+        ]
+      }
+    ```
+
+#### &#x1F4DA; Webpack 代码分割
+#### &#x1F4DA; Webpack 多入口打包
