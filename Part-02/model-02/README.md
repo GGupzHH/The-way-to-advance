@@ -1250,10 +1250,74 @@
         ]
       }
     ```
+
 #### &#x1F4DA; Webpack 提取公共模块
+  - 不同的入口一定会有公共的模块
+  - 公共的模块提取到一个bundle中
+    ```js
+      module.exports = {
+        optimization: {
+          splitChunks: {
+            // all表示我们会将所有的公共部分提取到一个bundle当中
+            chunks: 'all'
+          }
+        }
+      }
+    ```
+
 #### &#x1F4DA; Webpack 动态导入
+  - 按需加载-动态导入-所有动态导入的模块都会自动分包
+  - 实现
+    ```js
+      // 就是ESModule实现动态导入的方法
+      import('./post/posts').then(arg => {
+        console.log(arg)
+      })
+    ```
+
 #### &#x1F4DA; Webpack 魔法注释
+  - 默认动态导入的文件名称是一个序号
+  - 如果需要给这些文件命名的话
+  - 可以使用 魔法注释 的方式去实现
+    ```js
+      // 注释中的名字回作为打包文件的名字  post.bundle.js
+      import(/* webpackChunkName: 'post' */'./post/posts').then(arg => {
+        console.log(arg)
+      })
+
+      // del.bundle.js
+      import(/* webpackChunkName: 'del' */'./post/del').then(arg => {
+        console.log(arg)
+      })
+
+      // 如果 webpackChunkName 相同的话  那这两个动态引入的文件就会被打包到一个文件中 也就是相同name的那个文件中
+    ```
+
 #### &#x1F4DA; Webpack MiniCssExtractPlugin
+  - 可以从css打包结果提取的插件
+  - css的按需加载
+  - npm install MiniCssExtractPlugin -d
+    ```js
+      const MiniCssExtractPlugin = require('MiniCssExtractPlugin')
+      module.exports = {
+        module: {
+          rules: [
+            {
+              test: /\.css$/,
+              use: [
+                // 'style-loader',  // 将样式使用style 标签去注入到HTML中 而 MiniCssExtractPlugin 是将css处理成一个单独的文件去单独使用link引入 所以这里就不需要style-loader
+                MiniCssExtractPlugin.loader, // 取而代之我们使用MiniCssExtractPlugin提供的loader 去使用link
+                // 当css 大于150K的时候 才考虑是否提取到单独的文件中
+                'css-loader' // 处理样式
+              ]
+            }
+          ]
+        },
+        plugins: [
+          new MiniCssExtractPlugin()
+        ]
+      }
+    ```
 #### &#x1F4DA; Webpack OptimizeCssAssetsWebpackPlugin
 #### &#x1F4DA; Webpack 输出文件名 Hash
 #### &#x1F4DA; Webpack 输出文件名 Hash
