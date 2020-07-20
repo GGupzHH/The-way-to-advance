@@ -1179,5 +1179,168 @@
       }
     ```
 
-#### &#x1F4DA; Webpack 代码分割
+#### &#x1F4DA; Webpack 代码分割(code Splitting)
+  - webpack打包之后项目中所有的代码都会被打包到一起
+  - 但是在应用开始运行的时候并不是所有的模块都在执行
+  - 所以我们需要把我们的打包结果  按照一定规则分离 根据运行需要按需加载
+  - 大量的请求会造成资源浪费
+  - 两种分包方式
+    - 多入口打包
+    - export 动态导入
+
 #### &#x1F4DA; Webpack 多入口打包
+  - 最常见的划分规则就是
+    - 一个页面对应一个打包入口
+    - 不同页面公共的部分再去单独提取
+  - 实现多入口打包
+    ```js
+      // 给每一个js生成一个HTML文件 自动注入所有打包结果
+      const HtmlWebpackPlugin = require('html-webpack-plugin')
+      module.exports = {
+        // 如果入口定义成数组 那么webpack会认为你想将多个文件打包到一起 
+        entry: {
+          // 一个属性就是一个打包入口
+          index: './src/index.js',
+          album: './src/album.js'
+        }，
+        output: {
+          // 多入口打包 就需要多出口啊  这里用[name]去动态将entry的key动态注入
+          filename: '[name].bundle.js'
+        },
+        plugins: [
+          new HtmlWebpackPlugin({
+            title: 'Multi Entry',
+            template: './src/index.html',
+            filename: 'index.html'
+          }),
+          new HtmlWebpackPlugin({
+            title: 'Multi Entry',
+            template: './src/index.html',
+            filename: 'album.html'
+          })
+        ]
+      }
+      // 上面这样打包之后可以发现 每一个HTML都是将所有的打包的js引入了  这样即使将js分开打包了  但是还是在同一个文件中一起引入了
+      // 解决
+      // 给 HtmlWebpackPlugin 添加配置项 chunks 指定当前HTML的使用的打包的js  也就是上面entry入口定义的
+      module.exports = {
+        // 如果入口定义成数组 那么webpack会认为你想将多个文件打包到一起 
+        entry: {
+          // 一个属性就是一个打包入口
+          index: './src/index.js',
+          album: './src/album.js'
+        }，
+        output: {
+          // 多入口打包 就需要多出口啊  这里用[name]去动态将entry的key动态注入
+          filename: '[name].bundle.js'
+        },
+        plugins: [
+          new HtmlWebpackPlugin({
+            title: 'Multi Entry',
+            template: './src/index.html',
+            filename: 'index.html',
+            chunks: ['index']
+          }),
+          new HtmlWebpackPlugin({
+            title: 'Multi Entry',
+            template: './src/index.html',
+            filename: 'album.html',
+            chunks: ['album']
+          })
+        ]
+      }
+    ```
+
+#### &#x1F4DA; Webpack 提取公共模块
+  - 不同的入口一定会有公共的模块
+  - 公共的模块提取到一个bundle中
+    ```js
+      module.exports = {
+        optimization: {
+          splitChunks: {
+            // all表示我们会将所有的公共部分提取到一个bundle当中
+            chunks: 'all'
+          }
+        }
+      }
+    ```
+
+#### &#x1F4DA; Webpack 动态导入
+  - 按需加载-动态导入-所有动态导入的模块都会自动分包
+  - 实现
+    ```js
+      // 就是ESModule实现动态导入的方法
+      import('./post/posts').then(arg => {
+        console.log(arg)
+      })
+    ```
+
+#### &#x1F4DA; Webpack 魔法注释
+  - 默认动态导入的文件名称是一个序号
+  - 如果需要给这些文件命名的话
+  - 可以使用 魔法注释 的方式去实现
+    ```js
+      // 注释中的名字回作为打包文件的名字  post.bundle.js
+      import(/* webpackChunkName: 'post' */'./post/posts').then(arg => {
+        console.log(arg)
+      })
+
+      // del.bundle.js
+      import(/* webpackChunkName: 'del' */'./post/del').then(arg => {
+        console.log(arg)
+      })
+
+      // 如果 webpackChunkName 相同的话  那这两个动态引入的文件就会被打包到一个文件中 也就是相同name的那个文件中
+    ```
+
+#### &#x1F4DA; Webpack MiniCssExtractPlugin
+  - 可以从css打包结果提取的插件
+  - css的按需加载
+  - npm install MiniCssExtractPlugin -d
+    ```js
+      const MiniCssExtractPlugin = require('MiniCssExtractPlugin')
+      module.exports = {
+        module: {
+          rules: [
+            {
+              test: /\.css$/,
+              use: [
+                // 'style-loader',  // 将样式使用style 标签去注入到HTML中 而 MiniCssExtractPlugin 是将css处理成一个单独的文件去单独使用link引入 所以这里就不需要style-loader
+                MiniCssExtractPlugin.loader, // 取而代之我们使用MiniCssExtractPlugin提供的loader 去使用link
+                // 当css 大于150K的时候 才考虑是否提取到单独的文件中
+                'css-loader' // 处理样式
+              ]
+            }
+          ]
+        },
+        plugins: [
+          new MiniCssExtractPlugin()
+        ]
+      }
+    ```
+#### &#x1F4DA; Webpack OptimizeCssAssetsWebpackPlugin
+  - css资源文件没有被压缩 因为webpack内置的压缩只压缩js代码
+  - 这里我们使用 css 压缩的插件 optimize-css-assets-webpack-plugin
+    ```js
+      const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin')
+      module.exports = {
+        plugins: [
+          new OptimizeCssAssetsWebpackPlugin()
+        ]
+      }
+    ```
+  - 但是我们在官方看到 OptimizeCssAssetsWebpackPlugin 是设置到 optimization中 因为一般代码压缩都是在生产环境中去打包的
+  - 而 optimization 是生产环境默认启动的
+    ```js
+      // 当我们这里定义了 optimization 的时候  内置的js代码压缩器就会被覆盖 从而 js压缩器不执行
+      // 所以我们这里需要在使用另一个js压缩器 压缩js代码
+      // terser-webpack-plugin
+      const TerserWebpackPlugin = require('terser-webpack-plugin')
+      module.exports = {
+        optimization: [
+          new OptimizeCssAssetsWebpackPlugin(),
+          new TerserWebpackPlugin()
+        ]
+      }
+    ```
+#### &#x1F4DA; Webpack 输出文件名 Hash
