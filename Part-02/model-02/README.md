@@ -1319,5 +1319,28 @@
       }
     ```
 #### &#x1F4DA; Webpack OptimizeCssAssetsWebpackPlugin
-#### &#x1F4DA; Webpack 输出文件名 Hash
+  - css资源文件没有被压缩 因为webpack内置的压缩只压缩js代码
+  - 这里我们使用 css 压缩的插件 optimize-css-assets-webpack-plugin
+    ```js
+      const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin')
+      module.exports = {
+        plugins: [
+          new OptimizeCssAssetsWebpackPlugin()
+        ]
+      }
+    ```
+  - 但是我们在官方看到 OptimizeCssAssetsWebpackPlugin 是设置到 optimization中 因为一般代码压缩都是在生产环境中去打包的
+  - 而 optimization 是生产环境默认启动的
+    ```js
+      // 当我们这里定义了 optimization 的时候  内置的js代码压缩器就会被覆盖 从而 js压缩器不执行
+      // 所以我们这里需要在使用另一个js压缩器 压缩js代码
+      // terser-webpack-plugin
+      const TerserWebpackPlugin = require('terser-webpack-plugin')
+      module.exports = {
+        optimization: [
+          new OptimizeCssAssetsWebpackPlugin(),
+          new TerserWebpackPlugin()
+        ]
+      }
+    ```
 #### &#x1F4DA; Webpack 输出文件名 Hash
