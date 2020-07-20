@@ -1179,5 +1179,81 @@
       }
     ```
 
-#### &#x1F4DA; Webpack 代码分割
+#### &#x1F4DA; Webpack 代码分割(code Splitting)
+  - webpack打包之后项目中所有的代码都会被打包到一起
+  - 但是在应用开始运行的时候并不是所有的模块都在执行
+  - 所以我们需要把我们的打包结果  按照一定规则分离 根据运行需要按需加载
+  - 大量的请求会造成资源浪费
+  - 两种分包方式
+    - 多入口打包
+    - export 动态导入
+
 #### &#x1F4DA; Webpack 多入口打包
+  - 最常见的划分规则就是
+    - 一个页面对应一个打包入口
+    - 不同页面公共的部分再去单独提取
+  - 实现多入口打包
+    ```js
+      // 给每一个js生成一个HTML文件 自动注入所有打包结果
+      const HtmlWebpackPlugin = require('html-webpack-plugin')
+      module.exports = {
+        // 如果入口定义成数组 那么webpack会认为你想将多个文件打包到一起 
+        entry: {
+          // 一个属性就是一个打包入口
+          index: './src/index.js',
+          album: './src/album.js'
+        }，
+        output: {
+          // 多入口打包 就需要多出口啊  这里用[name]去动态将entry的key动态注入
+          filename: '[name].bundle.js'
+        },
+        plugins: [
+          new HtmlWebpackPlugin({
+            title: 'Multi Entry',
+            template: './src/index.html',
+            filename: 'index.html'
+          }),
+          new HtmlWebpackPlugin({
+            title: 'Multi Entry',
+            template: './src/index.html',
+            filename: 'album.html'
+          })
+        ]
+      }
+      // 上面这样打包之后可以发现 每一个HTML都是将所有的打包的js引入了  这样即使将js分开打包了  但是还是在同一个文件中一起引入了
+      // 解决
+      // 给 HtmlWebpackPlugin 添加配置项 chunks 指定当前HTML的使用的打包的js  也就是上面entry入口定义的
+      module.exports = {
+        // 如果入口定义成数组 那么webpack会认为你想将多个文件打包到一起 
+        entry: {
+          // 一个属性就是一个打包入口
+          index: './src/index.js',
+          album: './src/album.js'
+        }，
+        output: {
+          // 多入口打包 就需要多出口啊  这里用[name]去动态将entry的key动态注入
+          filename: '[name].bundle.js'
+        },
+        plugins: [
+          new HtmlWebpackPlugin({
+            title: 'Multi Entry',
+            template: './src/index.html',
+            filename: 'index.html',
+            chunks: ['index']
+          }),
+          new HtmlWebpackPlugin({
+            title: 'Multi Entry',
+            template: './src/index.html',
+            filename: 'album.html',
+            chunks: ['album']
+          })
+        ]
+      }
+    ```
+#### &#x1F4DA; Webpack 提取公共模块
+#### &#x1F4DA; Webpack 动态导入
+#### &#x1F4DA; Webpack 魔法注释
+#### &#x1F4DA; Webpack MiniCssExtractPlugin
+#### &#x1F4DA; Webpack OptimizeCssAssetsWebpackPlugin
+#### &#x1F4DA; Webpack 输出文件名 Hash
+#### &#x1F4DA; Webpack 输出文件名 Hash
