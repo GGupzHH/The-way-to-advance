@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "webpack-dev-server --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
-    "lint": "echo \"请使用 ESLint 实现此任务\""
+    "lint": "npm run serve"
   },
   "dependencies": {
     "@babel/core": "^7.10.5",
@@ -16,6 +16,9 @@
     "copy-webpack-plugin": "^6.0.3",
     "core-js": "^3.6.5",
     "css-loader": "^3.6.0",
+    "eslint": "^7.5.0",
+    "eslint-loader": "^4.0.2",
+    "eslint-plugin-vue-libs": "^4.0.0",
     "html-webpack-plugin": "^4.3.0",
     "less-loader": "^6.2.0",
     "style-loader": "^1.2.1",

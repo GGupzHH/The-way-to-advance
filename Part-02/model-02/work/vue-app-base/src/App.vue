@@ -12,7 +12,13 @@ export default {
   name: 'App',
   components: {
     HelloWorld
-  }
+  },
+  methods: {
+    a() {
+      let b = 0;
+      console.log(1 )
+    }
+  },
 }
 </script>
 
