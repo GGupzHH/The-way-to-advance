@@ -1,7 +1,6 @@
 const path = require('path')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
   mode: 'production',
@@ -17,7 +16,12 @@ module.exports = {
         // exclude 哪些文件不需要loader处理
         // include 哪些文件需要loader处理
         exclude: '/node_modules/',
-        loader: 'babel-loader'
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [ '@babel/preset-env' ]
+          }
+        }
       },
       {
         test: /\.vue$/,
@@ -73,16 +77,6 @@ module.exports = {
       filename: 'index.html',
       BASE_URL: './'
     }),
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: './src/assets/**',
-          to: 'public'
-        }, {
-          from: './public/favicon.ico',
-          to: '.'
-        }
-      ]
-    })
+    
   ]
 }
