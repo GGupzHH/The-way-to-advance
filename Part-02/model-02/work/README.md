@@ -33,3 +33,20 @@
     - 插件必须是一个函数或方法并且有apply方法
     - apply方法接收一个默认参数 compiler (webpackAPI) 该API有webpack提供的多种获取资源文件的方法
     - 处理之后再通过webpack提供的API返回
+
+
+### 3、编程题出现的问题总结
+  - 之前没做过有关webpack的配置和开发 感觉听课都很简单 写起来。。。
+  - 课下需要多练 多写
+  - 使用webpack-dev-server
+    - webpack-dev-server --config webpack.dev.js
+      ```txt
+        浏览器一直报错
+        Uncaught TypeError: Cannot convert undefined or null to object
+        不管用什么方式都定位不到错误位置
+        最后感觉是babel这块的问题
+        删除了 babel.config.js 问题解决
+        但是不知道为什么会有这样的问题
+        就按照我这个webpack的配置就存在这样的问题
+        是因为babel.config.js 中配置了别的东西吗  这块不太明白
+      ```
