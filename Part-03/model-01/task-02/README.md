@@ -23,8 +23,81 @@
     ```
 
 ### &#x1F4DA; 动态路由
-  
+  - 通过占位符  去匹配一个动态的路由
+    ```js
+      const routes = [
+        {
+          path: '/',
+          name: 'Index',
+          component: Index
+        },
+        {
+          path: '/detail/:id',
+          name: 'Detail',
+          // 开启 props，会把 URL 中的参数传递给组件
+          // 在组件中通过 props 来接收 URL 参数
+          props: true,
+          // route level code-splitting
+          // this generates a separate chunk (about.[hash].js) for this route
+          // which is lazy-loaded when the route is visited.
+          component: () => import(/* webpackChunkName: "detail" */ '../views/Detail.vue')
+        }
+      ]
+    ```
+  - 组件内部获取动态路由参数
+    ```vue
+      <template>
+        <div>
+          <!-- 方式1： 通过当前路由规则，获取数据 -->
+          通过当前路由规则获取：{{ $route.params.id }}
+
+          <br>
+          <!-- 方式2：路由规则中开启 props 传参 -->
+          通过开启 props 获取：{{ id }}
+        </div>
+      </template>
+
+      <script>
+        export default {
+          name: 'Detail',
+          props: ['id']
+        }
+      </script>
+
+      <style>
+
+      </style>
+    ```
+
 ### &#x1F4DA; 嵌套路由
+  ```js
+    const routes = [
+      {
+        name: 'login',
+        path: '/login',
+        component: Login
+      },
+      // 嵌套路由
+      {
+        // 只要路由匹配到了  /   就会渲染Layout  然后Layout里面也有router-view 就会渲染内部路由
+        path: '/',
+        component: Layout,
+        children: [
+          {
+            name: 'index',
+            path: '',
+            component: Index
+          },
+          {
+            name: 'detail',
+            path: 'detail/:id',
+            props: true,
+            component: () => import('@/views/Detail.vue')
+          }
+        ]
+      }
+    ]
+  ```
 ### &#x1F4DA; 编程式导航
 ### &#x1F4DA; Hash 模式和 History 模式的区别
 ### &#x1F4DA; History 模式
