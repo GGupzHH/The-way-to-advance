@@ -207,3 +207,16 @@
         }
       }
     ```
+
+### &#x1F4DA; VueRouter 实现原理
+  - vue前置知识
+    - 插件
+    - 混入
+    - Vue.observable()
+    - 插槽
+    - rander函数
+    - 运行时和完整版Vue
+    
+### &#x1F4DA; VueRouter 模拟实现-分析
+### &#x1F4DA; VueRouter-install
+### &#x1F4DA; VueRouter-构造函数
