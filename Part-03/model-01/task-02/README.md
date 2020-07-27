@@ -99,7 +99,124 @@
     ]
   ```
 ### &#x1F4DA; 编程式导航
+  ```vue
+    <template>
+      <div class="home">
+        <div id="nav">
+          <router-link to="/">Index</router-link>
+        </div>
+        <button @click="replace"> replace </button>
+
+        <button @click="goDetail"> Detail </button>
+      </div>
+    </template>
+
+    <script>
+    export default {
+      name: 'Index',
+      methods: {
+        // 我们可以长按浏览器后退按钮 看到路由历史
+        replace () { 
+          // 但是replace方法不会记录本次历史 他会替换当前历史
+          this.$router.replace('/login')
+        },
+        goDetail () {
+          // 会在浏览器后退按钮中可以看到历史记录
+          this.$router.push({ name: 'Detail', params: { id: 1 } })
+          this.$router.push({ path: '/', params: { id: 1 } })
+        },
+        go () {
+          // -2 就是跳转到上上次
+          this.$router.go(-2)
+        }
+      }
+    }
+    </script>
+  ```
+
 ### &#x1F4DA; Hash 模式和 History 模式的区别
+  - 都是客户端实现路由方式
+    ```txt
+      也就是客户端发生变化的时候不会向服务端发送请求 使用js实现 根据不同的路由实现不同的页面的替换
+    ```
+  - 表现形式的区别
+    - Hash
+      - hhtps://music.164.com/#/playle?id=110
+      - 会携带# 
+      - 参数在 ? 后面拼接
+      - 很丑
+    - History
+      - hhtps://music.164.com/playle/110
+      - 正常的URL
+      - 需要服务端配合
+  - 原理区别
+    - Hash
+      - 基于锚点 以及onhashChange事件 通过锚点的值 作为路由地址 当地址发生变的时候 触发onhashChange事件 之后根据路径决定页面的内容
+    - History
+      - 基于HTML5 的HistoryApi
+        - history.pushState()  // IE10以后才支持 会向服务器发送请求
+        - history.replaceState() // 不会向服务器发送请求 只会改变浏览器地址栏的地址 并且把这个地址记录到历史记录中 所以可以实现客户端路由
+
 ### &#x1F4DA; History 模式
+  - 需要服务器的支持
+  - /login 会发送请求  如果服务端不存在这样的请求就会返回404
+  - 所以在服务端配置 除了静态资源都返回单页引用的index.html
+  - 需要在创建路由的时候设定mode: 'history'
+
 ### &#x1F4DA; History 模式 - Node.js
-### &#x1F4DA; History 模式 - nginx.
+  - 后端没有配置
+    ```txt
+      第一次打开页面的时候返回第一个路由 此时切换路由 页面都正常 因为此时处理URL改变的是history处理的  也就是js处理的  当我们在另一个路由刷新浏览器的时候 此时因为后端没有配置history模式  就是认为像一般发送ajax请求一样处理 返回一个找不到该请求
+    ```
+  - node 
+    ```js
+      const path = require('path')
+      // 导入处理 history 模式的模块
+      const history = require('connect-history-api-fallback')
+      // 导入 express
+      const express = require('express')
+
+      const app = express()
+      // 注册处理 history 模式的中间件
+      app.use(history())
+      // 处理静态资源的中间件，网站根目录 ../web
+      app.use(express.static(path.join(__dirname, '../web')))
+
+      // 开启服务器，端口是 3000
+      app.listen(3000, () => {
+        console.log('服务器开启，端口：3000')
+      })
+    ```
+
+### &#x1F4DA; History 模式 - nginx. 
+  - 在NGINX文件夹中conf中的nginx.conf 配置
+    ```nginx
+      http {
+        server {
+          #当我们在地址栏输入location的时候 默认的首页 就会去找 index.html
+          location / {
+            root   html;
+            index  index.html index.htm;
+            #试着去访问一下这个文件 
+            #$uri 就是当前请求的路径
+            #$uri/ 就去当前这个路径下面再去找一下index.html 或者index.htm
+            #如果还是没找到就返回 我们此时的index.html 
+            #此时返回的index.html就会被浏览器处理 
+            try_files $uri $uri/ /index.html;
+          }
+        }
+      }
+    ```
+
+### &#x1F4DA; VueRouter 实现原理
+  - vue前置知识
+    - 插件
+    - 混入
+    - Vue.observable()
+    - 插槽
+    - rander函数
+    - 运行时和完整版Vue
+    
+### &#x1F4DA; VueRouter 模拟实现-分析
+### &#x1F4DA; VueRouter-install
+### &#x1F4DA; VueRouter-构造函数
