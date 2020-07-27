@@ -99,7 +99,69 @@
     ]
   ```
 ### &#x1F4DA; 编程式导航
+  ```vue
+    <template>
+      <div class="home">
+        <div id="nav">
+          <router-link to="/">Index</router-link>
+        </div>
+        <button @click="replace"> replace </button>
+
+        <button @click="goDetail"> Detail </button>
+      </div>
+    </template>
+
+    <script>
+    export default {
+      name: 'Index',
+      methods: {
+        // 我们可以长按浏览器后退按钮 看到路由历史
+        replace () { 
+          // 但是replace方法不会记录本次历史 他会替换当前历史
+          this.$router.replace('/login')
+        },
+        goDetail () {
+          // 会在浏览器后退按钮中可以看到历史记录
+          this.$router.push({ name: 'Detail', params: { id: 1 } })
+          this.$router.push({ path: '/', params: { id: 1 } })
+        },
+        go () {
+          // -2 就是跳转到上上次
+          this.$router.go(-2)
+        }
+      }
+    }
+    </script>
+  ```
+
 ### &#x1F4DA; Hash 模式和 History 模式的区别
+  - 都是客户端实现路由方式
+    ```txt
+      也就是客户端发生变化的时候不会向服务端发送请求 使用js实现 根据不同的路由实现不同的页面的替换
+    ```
+  - 表现形式的区别
+    - Hash
+      - hhtps://music.164.com/#/playle?id=110
+      - 会携带# 
+      - 参数在 ? 后面拼接
+      - 很丑
+    - History
+      - hhtps://music.164.com/playle/110
+      - 正常的URL
+      - 需要服务端配合
+  - 原理区别
+    - Hash
+      - 基于锚点 以及onhashChange事件 通过锚点的值 作为路由地址 当地址发生变的时候 触发onhashChange事件 之后根据路径决定页面的内容
+    - History
+      - 基于HTML5 的HistoryApi
+        - history.pushState()  // IE10以后才支持 会向服务器发送请求
+        - history.replaceState() // 不会向服务器发送请求 只会改变浏览器地址栏的地址 并且把这个地址记录到历史记录中 所以可以实现客户端路由
+
 ### &#x1F4DA; History 模式
+  - 需要服务器的支持
+  - /login 会发送请求  如果服务端不存在这样的请求就会返回404
+  - 所以在服务端配置 除了静态资源都返回单页引用的index.html
+  - 需要在创建路由的时候设定mode: 'history'
+  
 ### &#x1F4DA; History 模式 - Node.js
 ### &#x1F4DA; History 模式 - nginx.
