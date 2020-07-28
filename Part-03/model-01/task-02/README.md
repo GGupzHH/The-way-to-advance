@@ -218,5 +218,11 @@
     - 运行时和完整版Vue
     
 ### &#x1F4DA; VueRouter 模拟实现-分析
+  - Vue.use() 如果传入的是函数 就调用函数 如果传入的是对象  就调用对象的install方法
+  - new VueRouter 可见是一个构造函数或者Class 这里我们使用Class (Class 也是对象) 并且应该有一个install静态的方法
+  - ![Image text](../../image/001.jpg)
 ### &#x1F4DA; VueRouter-install
+  ```js
+    
+  ```
 ### &#x1F4DA; VueRouter-构造函数
