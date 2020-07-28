@@ -21,4 +21,18 @@ export default class VueRouter {
       }
     })
   }
+  constructor(options) {
+    // 当前传入构造的属性 路由规则
+    this.options = options
+    // 将options传入的路由规则 解析 存储到routeMap中
+    // 键  路由地址
+    // 值  路由组件
+    // 最后将对应的地址和组件渲染到浏览器中
+    this.routeMap = {}
+    // 响应式对象 current 当前路由对象
+    // 响应式 使用 _Vue.observable实现 实现响应式对象
+    this.data = _Vue.observable({
+      current: '/'
+    })
+  }
 }
