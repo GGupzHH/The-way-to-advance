@@ -17,10 +17,12 @@ export default class VueRouter {
         // 如果当前注入则不注入 反之
         if (this.$options.router) {
           _Vue.prototype.$router = this.$options.router
+          _Vue.prototype.$router.init()
         }
       }
     })
   }
+
   constructor(options) {
     // 当前传入构造的属性 路由规则
     this.options = options
@@ -33,6 +35,32 @@ export default class VueRouter {
     // 响应式 使用 _Vue.observable实现 实现响应式对象
     this.data = _Vue.observable({
       current: '/'
+    })
+  }
+
+  // 调用在router挂载到vue实例上面的后面调用
+  init() {
+    // 调用这两个初始化函数
+    this.createRouteMap()
+    this.initComponents(_Vue)
+  }
+
+  createRouteMap() {
+    // 这个方法是将路由规则遍历存储到当前实例的routeMap当中  
+    // 键 路由路径
+    // 值 路由组件
+    this.options.routes.forEach(route => {
+      this.routeMap[route.path] = route.component
+    })
+  }
+
+  initComponents(Vue)  {
+    Vue.component('router-link', {
+      props: {
+        to: String
+      },
+      // 使用插槽 slot
+      template: `<a :href="to"><slot></slot></a>`
     })
   }
 }

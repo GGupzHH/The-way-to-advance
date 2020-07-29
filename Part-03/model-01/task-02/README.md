@@ -223,6 +223,63 @@
   - ![Image text](../../image/001.jpg)
 ### &#x1F4DA; VueRouter-install
   ```js
-    
+    static install(Vue) {
+      // 1 判断当前是否安装过VueRouter
+      if(VueRouter.install.installed) {
+        return
+      }
+      VueRouter.install.installed = true
+      // 2. 把Vue实例记录到全局变量
+      _Vue = Vue
+      // 3. 将创建Vue实例的时候传入的router对象注入到Vue实例上
+      // 采用混入的方法注入
+      _Vue.mixin({
+        // 混入： 混入 (mixin) 提供了一种非常灵活的方式，来分发 Vue 组件中的可复用功能。
+        // 一个混入对象可以包含任意组件选项。当组件使用混入对象时，所有混入对象的选项将被“混合”进入该组件本身的选项。
+        beforeCreate() {
+          // 如果当前注入则不注入 反之
+          if (this.$options.router) {
+            _Vue.prototype.$router = this.$options.router
+          }
+        }
+      })
+    }
   ```
-### &#x1F4DA; VueRouter-构造函数
+
+### &#x1F4DA; VueRouter-createRouteMap
+  - createRouteMap
+    ```js
+      createRouteMap() {
+        // 这个方法是将路由规则遍历存储到当前实例的routeMap当中  
+        // 键 路由路径
+        // 值 路由组件
+        this.options.routes.forEach(route => {
+          this.routeMap[route.path] = route.component
+        })
+      }
+    ```
+
+### &#x1F4DA; VueRouter-router-link
+  - 创建route-link组件 使用 Vue.component 创建
+  - 创建失败原因
+    - Vue构建版本 vue-cli 默认使用的是运行时版
+      - 运行时版
+        ```txt
+          不支持template模板，需要打包之前提前编译
+        ```
+      - 完整版
+        ```txt
+          包含运行时和编译器，体积比运行时版大10K左右，程序运行时把模板转换成render函数
+        ```
+        
+### &#x1F4DA; VueRouter-完整版的 Vue
+  - [需要在项目目录配置 vue.config.js 配置](https://cli.vuejs.org/zh/config/#runtimecompiler)
+  - 使用Vue完整版  完整版包含编译器 但是文件将大10KB左右 
+    - vue.config.js
+      ```js
+        module.exports = {
+          runtimeCompiler: true
+        }
+      ```
+
+### &#x1F4DA; VueRouter-render
