@@ -17,6 +17,7 @@ export default class VueRouter {
         // 如果当前注入则不注入 反之
         if (this.$options.router) {
           _Vue.prototype.$router = this.$options.router
+          _Vue.prototype.$router.init()
         }
       }
     })
@@ -37,6 +38,13 @@ export default class VueRouter {
     })
   }
 
+  // 调用在router挂载到vue实例上面的后面调用
+  init() {
+    // 调用这两个初始化函数
+    this.createRouteMap()
+    this.initComponents(_Vue)
+  }
+
   createRouteMap() {
     // 这个方法是将路由规则遍历存储到当前实例的routeMap当中  
     // 键 路由路径
@@ -51,6 +59,7 @@ export default class VueRouter {
       props: {
         to: String
       },
+      // 使用插槽 slot
       template: `<a :href="to"><slot></slot></a>`
     })
   }

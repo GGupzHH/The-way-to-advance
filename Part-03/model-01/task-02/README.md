@@ -272,3 +272,14 @@
           包含运行时和编译器，体积比运行时版大10K左右，程序运行时把模板转换成render函数
         ```
         
+### &#x1F4DA; VueRouter-完整版的 Vue
+  - [需要在项目目录配置 vue.config.js 配置](https://cli.vuejs.org/zh/config/#runtimecompiler)
+  - 使用Vue完整版  完整版包含编译器 但是文件将大10KB左右 
+    - vue.config.js
+      ```js
+        module.exports = {
+          runtimeCompiler: true
+        }
+      ```
+
+### &#x1F4DA; VueRouter-render
