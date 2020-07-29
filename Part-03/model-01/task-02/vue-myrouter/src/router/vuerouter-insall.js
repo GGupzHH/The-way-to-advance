@@ -21,6 +21,7 @@ export default class VueRouter {
       }
     })
   }
+
   constructor(options) {
     // 当前传入构造的属性 路由规则
     this.options = options
@@ -44,5 +45,13 @@ export default class VueRouter {
       this.routeMap[route.path] = route.component
     })
   }
-  
+
+  initComponents(Vue)  {
+    Vue.component('router-link', {
+      props: {
+        to: String
+      },
+      template: `<a :href="to"><slot></slot></a>`
+    })
+  }
 }
