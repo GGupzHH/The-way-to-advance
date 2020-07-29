@@ -35,4 +35,14 @@ export default class VueRouter {
       current: '/'
     })
   }
+
+  createRouteMap() {
+    // 这个方法是将路由规则遍历存储到当前实例的routeMap当中  
+    // 键 路由路径
+    // 值 路由组件
+    this.options.routes.forEach(route => {
+      this.routeMap[route.path] = route.component
+    })
+  }
+  
 }
