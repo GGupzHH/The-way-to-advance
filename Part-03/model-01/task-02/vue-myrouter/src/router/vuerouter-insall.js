@@ -43,6 +43,7 @@ export default class VueRouter {
     // 调用这两个初始化函数
     this.createRouteMap()
     this.initComponents(_Vue)
+    this.initEvent()
   }
 
   createRouteMap() {
@@ -59,8 +60,55 @@ export default class VueRouter {
       props: {
         to: String
       },
-      // 使用插槽 slot
-      template: `<a :href="to"><slot></slot></a>`
+      // // 使用插槽 slot
+      // template: `<a :href="to"><slot></slot></a>`
+
+      // 使用render函数
+      // h 函数是创建虚拟DOM
+      // h 函数存在3个参数
+      // 1. 创建元素对应的选择器  因为创建的是  a   所以直接使用标签选择器
+      // 2. 设置该元素的DOM属性
+      // 3. 设置该元素内容  也就是生成元素的子元素
+      render(h) {
+        return h('a', {
+          attrs: {
+            href: this.to
+          },
+          // 给当前DOM元素绑定事件
+          on: {
+            click: this.cliclHandler
+          }
+        }, [this.$slots.default]) // this.$slots.default  默认插槽
+      },
+      methods: {
+        cliclHandler(e) {
+          // 阻止a默认事件
+          e.preventDefault();
+          // 阻止默认事件之后改变浏览器URL
+          // pushState 有三个参数
+          // 1. 后面要用的数据
+          // 2. 当前页面title
+          // 3. 要改成什么样的URL
+          history.pushState({}, '', this.to)
+          // 改完URL 渲染对应组件  因为路由data是响应式的  当我们改变了当前路由 就会加载对应的组件 并且会重新渲染
+          this.$router.data.current = this.to
+        }
+      }
+    })
+    const self = this
+    Vue.component('router-view', {
+      render(h) {
+        // 获取当前路由对应的组件  使用render函数去处理 如果只是做这些操作 我们发现 上面router-link的a标签 会有默认行为刷新浏览器
+        let component = self.routeMap[self.data.current]
+        return h(component)
+      }
+    })
+  }
+
+  initEvent() {
+    // popstate 只有在pushState执行之后才会存在这个事件 
+    window.addEventListener('popstate', () => {
+      this.data.current = window.location.pathname
     })
   }
 }

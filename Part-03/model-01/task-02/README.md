@@ -283,3 +283,28 @@
       ```
 
 ### &#x1F4DA; VueRouter-render
+  - template 在完整版编译也是通过render函数去编译
+    ```js
+      render(h) {
+        return h('a', {
+          attrs: {
+            href: this.to
+          }
+        }, [this.$slots.default]) // this.$slots.default  默认插槽
+      }
+    ```
+### &#x1F4DA;  完整版Vue和运行时版本的区别
+  - 完整版包含编译器 可以编译Template模板 大10KB左右 Template编译也是通过render函数去编译的
+  - 运行时版本不包含编译器 不能编译Template模板 但是可以通过render函数去编译
+
+### &#x1F4DA; VueRouter-router-view
+  - 先实现router-view组件
+  - 修改 router-link 组件 a 标签默认行为 
+  - 修改URL
+  - 修改当前路由 -> 响应式 -> 对应组件刷新
+
+### &#x1F4DA; VueRouter-initEvent
+  - 点击前进后退没有渲染对应组件
+  - 当活动历史记录条目更改时，将触发popstate事件。如果被激活的历史记录条目是通过对history.pushState()的调用创建的，或者受到对history.replaceState()的调用的影响，popstate事件的state属性包含历史条目的状态对象的副本。
+  - 需要注意的是调用history.pushState()或history.replaceState()不会触发popstate事件。只有在做出浏览器动作时，才会触发该事件，如用户点击浏览器的回退按钮（或者在Javascript代码中调用history.back()）
+  
