@@ -283,3 +283,17 @@
       ```
 
 ### &#x1F4DA; VueRouter-render
+  - template 在完整版编译也是通过render函数去编译
+    ```js
+      render(h) {
+        return h('a', {
+          attrs: {
+            href: this.to
+          }
+        }, [this.$slots.default]) // this.$slots.default  默认插槽
+      }
+    ```
+### &#x1F4DA;  完整版Vue和运行时版本的区别
+  - 完整版包含编译器 可以编译Template模板 大10KB左右 Template编译也是通过render函数去编译的
+  - 运行时版本不包含编译器 不能编译Template模板 但是可以通过render函数去编译
+

@@ -59,8 +59,22 @@ export default class VueRouter {
       props: {
         to: String
       },
-      // 使用插槽 slot
-      template: `<a :href="to"><slot></slot></a>`
+      // // 使用插槽 slot
+      // template: `<a :href="to"><slot></slot></a>`
+
+      // 使用render函数
+      // h 函数是创建虚拟DOM
+      // h 函数存在3个参数
+      // 1. 创建元素对应的选择器  因为创建的是  a   所以直接使用标签选择器
+      // 2. 设置该元素的DOM属性
+      // 3. 设置该元素内容  也就是生成元素的子元素
+      render(h) {
+        return h('a', {
+          attrs: {
+            href: this.to
+          }
+        }, [this.$slots.default]) // this.$slots.default  默认插槽
+      }
     })
   }
 }
