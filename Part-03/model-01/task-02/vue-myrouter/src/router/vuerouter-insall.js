@@ -16,6 +16,8 @@ export default class VueRouter {
       beforeCreate() {
         // 如果当前注入则不注入 反之
         if (this.$options.router) {
+          // 当前如果不是默认页面 刷新页面的时候 获取当前路由并修改current
+          // this.$options.router.data.current = window.location.pathname
           _Vue.prototype.$router = this.$options.router
           _Vue.prototype.$router.init()
         }
@@ -34,7 +36,7 @@ export default class VueRouter {
     // 响应式对象 current 当前路由对象
     // 响应式 使用 _Vue.observable实现 实现响应式对象
     this.data = _Vue.observable({
-      current: '/'
+      current: window.location.pathname
     })
   }
 
