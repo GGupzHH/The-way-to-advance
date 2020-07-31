@@ -16,6 +16,8 @@ export default class VueRouter {
       beforeCreate() {
         // 如果当前注入则不注入 反之
         if (this.$options.router) {
+          // 当前如果不是默认页面 刷新页面的时候 获取当前路由并修改current
+          this.$options.router.data.current = window.location.pathname
           _Vue.prototype.$router = this.$options.router
           _Vue.prototype.$router.init()
         }
@@ -24,6 +26,7 @@ export default class VueRouter {
   }
 
   constructor(options) {
+    console.log(1)
     // 当前传入构造的属性 路由规则
     this.options = options
     // 将options传入的路由规则 解析 存储到routeMap中
