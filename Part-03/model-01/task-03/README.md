@@ -180,3 +180,97 @@
   - 发布订阅模式 是由统一的调度中心去调用 因此发布者和订阅者不需要知道对方的存在
   - ![Image text](../../image/002.jpg)
 
+### &#x1F4DA; 模拟Vue响应式原理-分析
+  - Vue 基本结构
+  - 打印Vue实例观察结构
+  - 整体结构
+
+### &#x1F4DA; Vue
+  - 功能
+    - 负责接收初始化的参数
+    - 负责把data中的属性注入到Vue实例  转换成getter和setter
+    - 负责调用observer监听data中所有属性的变化
+    - 负责调用compiler解析指令/插值表达式
+  - ![Image text](../../image/003.jpg)
+  - 实现
+    ```js
+      class Vue {
+        constructor(options) {
+          // 1. 通过属性保存选项的数据
+          this.$options = options || {}
+          this.$data = options.data || {}
+          this.$el = typeof options.el === 'string' ? document.querySelector(options.el) : options.el
+          // 2. 把data中的成员转换成getter 和 setter 注入到Vue实例
+          this._proxyData(this.$data)
+          // 3. 调用observer对象，监听数据的变化
+          // 4. 调用compiler对象，解析插值表达式和指令
+        }
+
+        // _ 开头的都是默认私有的
+        _proxyData(data) {
+          // 1. 遍历data中的所有属性
+          Object.keys(data).forEach(key => {
+            // 2. 把data的属性注入到vue实例
+            // defineProperty 可以给当前绑定的对象添加任意key   也就是下面this虽然没有当前data拥有的属性 但是可以通过defineProperty添加 并且赋值
+            Object.defineProperty(this, key, {
+              // 可枚举
+              enumerable: true,
+              // 可遍历
+              configurable: true,
+              get() {
+                return data[key]
+              },
+              set(newValue) {
+                if (data[key] === newValue) {
+                  return
+                }
+                data[key] = newValue
+              }
+            })
+          })
+        }
+      }
+    ```
+
+### &#x1F4DA; observer
+  - 功能
+    - 负责把data选项中的属性转换成响应式数据
+    - data中的某些属性也是对象，把该属性转换成响应式数据
+    - 数据变化发送通知
+  - 结构
+    - ![Image text](../../image/004.jpg)
+  - 代码
+    ```js
+      class Observer {
+        constructor(data) {
+          this.walk(data)
+        }
+
+        walk(data) {
+          // 1. 判断data是否为对象
+          if (!data && typeof data !== 'object') {
+            return
+          }
+          // 2. 遍历data对象所有属性 绑定get set方法
+          Object.keys(data).forEach(key => {
+            this.defineReactive(data, key, data[key])
+          })
+        }
+
+        defineReactive(obj, key, val) {
+          Object.defineProperty(obj, key, {
+            get() {
+              return val
+            },
+            set(newvalue) {
+              if (val === newvalue) {
+                return
+              }
+              val = newvalue
+              // 发送通知
+            }
+          })
+        }
+      }
+    ```
+    
