@@ -131,4 +131,36 @@
   ```
 
 ### &#x1F4DA; 发布订阅模式
+  ```js
+    // 事件触发器
+    class EventEmitter {
+      constructor() {
+        this.event_case = Object.create(null)
+      }
+      // 订阅通知
+      $on(eventType, handler) {
+        this.event_case[eventType] = this.event_case[eventType] || []
+        this.event_case[eventType].push(handler)
+      }
+      // 发布通知
+      $emit(eventType) {
+        if (this.event_case[eventType]) {
+          this.event_case[eventType].forEach(handler => {
+            handler()
+          })
+        }
+      }
+    }
+
+    // 测试
+    let em = new EventEmitter()
+    em.$on('click', () => {
+      console.log('click1')
+    })
+    em.$on('click', () => {
+      console.log('click2')
+    })
+
+    em.$emit('click')
+  ```
 ### &#x1F4DA; 观察者模式
