@@ -24,7 +24,79 @@
     - 数据驱动是Vue最独特的特性之一
       - 开发过程中只需要关注数据本身 不需要关注数据是如何渲染到视图的 
       
-### &#x1F4DA; 数据响应式核心原理-Vue2
+### &#x1F4DA; 数据响应式核心原理-Vue2\
+  - 兼容性IE8+(不包括IE8)
+  - Object.defineProperty
+    ```js
+      // 模拟 Vue 中的 data 选项
+      let data = {
+        msg: 'hello'
+      }
+
+      // 模拟 Vue 的实例
+      let vm = {}
+
+      // 数据劫持：当访问或者设置 vm 中的成员的时候，做一些干预操作
+      Object.defineProperty(vm, 'msg', {
+        // 可枚举（可遍历）
+        enumerable: true,
+        // 可配置（可以使用 delete 删除，可以通过 defineProperty 重新定义）
+        configurable: true,
+        // 当获取值的时候执行
+        get () {
+          console.log('get: ', data.msg)
+          return data.msg
+        },
+        // 当设置值的时候执行
+        set (newValue) {
+          console.log('set: ', newValue)
+          if (newValue === data.msg) {
+            return
+          }
+          data.msg = newValue
+          // 数据更改，更新 DOM 的值
+          document.querySelector('#app').textContent = data.msg
+        }
+      })
+    ```
+  - Object.defineProperty 监听对象多个属性
+    ```js
+      let data = {
+        msg: 'hello',
+        count: 10
+      }
+
+      // 模拟 Vue 的实例
+      let vm = {}
+
+      proxyData(data)
+
+      function proxyData(data) {
+        // 遍历 data 对象的所有属性
+        Object.keys(data).forEach(key => {
+          // 把 data 中的属性，转换成 vm 的 setter/setter
+          Object.defineProperty(vm, key, {
+            enumerable: true,
+            configurable: true,
+            get () {
+              console.log('get: ', key, data[key])
+              return data[key]
+            },
+            set (newValue) {
+              console.log('set: ', key, newValue)
+              if (newValue === data[key]) {
+                return
+              }
+              data[key] = newValue
+              // 数据更改，更新 DOM 的值
+              document.querySelector('#app').textContent = data[key]
+            }
+          })
+        })
+      }
+    ```
+
 ### &#x1F4DA; 数据响应式核心原理-Vue3
+  
 ### &#x1F4DA; 发布订阅模式
 ### &#x1F4DA; 观察者模式
