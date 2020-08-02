@@ -180,3 +180,15 @@
   - 发布订阅模式 是由统一的调度中心去调用 因此发布者和订阅者不需要知道对方的存在
   - ![Image text](../../image/002.jpg)
 
+### &#x1F4DA; 模拟Vue响应式原理-分析
+  - Vue 基本结构
+  - 打印Vue实例观察结构
+  - 整体结构
+
+### &#x1F4DA; Vue
+  - 功能
+    - 负责接收初始化的参数
+    - 负责把data中的属性注入到Vue实例  转换成getter和setter
+    - 负责调用observer监听data中所有属性的变化
+    - 负责调用compiler解析指令/插值表达式
+  - ![Image text](../../image/003.jpg)
