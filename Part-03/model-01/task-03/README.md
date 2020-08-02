@@ -130,7 +130,10 @@
     console.log(vm.msg)
   ```
 
-### &#x1F4DA; 发布订阅模式
+### &#x1F4DA; 发布订阅模式(publish-subscribe-pattern)
+  - 订阅者
+  - 发布者
+  - 信号中心
   ```js
     // 事件触发器
     class EventEmitter {
