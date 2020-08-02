@@ -97,6 +97,38 @@
     ```
 
 ### &#x1F4DA; 数据响应式核心原理-Vue3
-  
+  - 直接监听对象 而非属性
+  - IE 6 新增 IE不支持 性能由浏览器优化
+  ```js
+    // 模拟 Vue 中的 data 选项
+    let data = {
+      msg: 'hello',
+      count: 0
+    }
+
+    // 模拟 Vue 实例
+    let vm = new Proxy(data, {
+      // 执行代理行为的函数
+      // 当访问 vm 的成员会执行
+      get (target, key) {
+        console.log('get, key: ', key, target[key])
+        return target[key]
+      },
+      // 当设置 vm 的成员会执行
+      set (target, key, newValue) {
+        console.log('set, key: ', key, newValue)
+        if (target[key] === newValue) {
+          return
+        }
+        target[key] = newValue
+        document.querySelector('#app').textContent = target[key]
+      }
+    })
+
+    // 测试
+    vm.msg = 'Hello World'
+    console.log(vm.msg)
+  ```
+
 ### &#x1F4DA; 发布订阅模式
 ### &#x1F4DA; 观察者模式
