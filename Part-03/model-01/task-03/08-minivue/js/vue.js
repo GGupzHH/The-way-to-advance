@@ -7,6 +7,7 @@ class Vue {
     // 2. 把data中的成员转换成getter 和 setter 注入到Vue实例
     this._proxyData(this.$data)
     // 3. 调用observer对象，监听数据的变化
+    new Observer(this.$data)
     // 4. 调用compiler对象，解析插值表达式和指令
   }
 
