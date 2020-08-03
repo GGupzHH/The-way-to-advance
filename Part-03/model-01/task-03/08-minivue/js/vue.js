@@ -9,6 +9,7 @@ class Vue {
     // 3. 调用observer对象，监听数据的变化
     new Observer(this.$data)
     // 4. 调用compiler对象，解析插值表达式和指令
+    new Compiler(this)
   }
 
   // _ 开头的都是默认私有的
