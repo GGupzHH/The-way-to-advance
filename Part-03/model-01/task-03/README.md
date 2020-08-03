@@ -274,3 +274,15 @@
       }
     ```
     
+### &#x1F4DA; Observer-defineReactive1
+  - 解释下 defineReactive为什么要传value
+    - 因为获取的是对象中的值 取值的时候又触发了get方法 死循环
+    - value传入形成了闭包 value的值会一直保存
+
+### &#x1F4DA; Observer-defineReactive2
+  - 1. 当data的中的数据不是基本类型的时候 我们需要把复杂类型的数据内部的属性也绑定 get 和 set
+  - 2. 当原本在data属性中是基本类型的数据，后来改变成了复杂数据类型的时候，我们需要把新改变的值也绑定 get 和 set
+    ```js
+      // 解决办法都是去调用 walk 方法 因为 walk 方法内部实现了对不同类型数据的处理 和 触发绑定 get set 方法函数
+    ```
+    
