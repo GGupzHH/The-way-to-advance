@@ -21,8 +21,37 @@ class Compiler {
   }
   // 解析元素节点的指令
   compilerElement(node) {
-    console.log(node)
+    // 1. 遍历当前元素所有属性
+    Array.from(node.attributes).forEach(attr => {
+      // attr就是当前属性的描述
+      // attr.name 当前属性名
+      // attr.value 当前属性值
+      let attrName = attr.name
+      // 判断当前属性是不是V指令
+      if (this.isDirective(attrName)) {
+        // v-text -> text
+        attrName = attrName.substr(2)
+        let key = attr.value
+        this.update(node, key, attrName)
+      }
+    })
   }
+  update(node, key, attrName) {
+    // 通过指令名称调用指定的处理函数
+    let updateFn = this[attrName + 'Updater']
+    // 判断当前 处理函数 是否存在
+    updateFn && updateFn(node, this.vm[key])
+  }
+  // text指令的具体实现 需要改变当前节点的内容
+  textUpdater(node, value) {
+    node.textContent = value
+  }
+  
+  // model指令的具体实现 只需要改变当前input的内容
+  modelUpdater(node, value) {
+    node.value = value
+  }
+
   // 解析插值表达式
   compilerText(node) {
     // 利用正则匹配插值表达式的内容 通过this.vm 去获取实际数据替换
