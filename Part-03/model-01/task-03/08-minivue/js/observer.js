@@ -5,7 +5,7 @@ class Observer {
 
   walk(data) {
     // 1. 判断data是否为对象
-    if (!data && typeof data !== 'object') {
+    if (!data || typeof data !== 'object') {
       return
     }
     // 2. 遍历data对象所有属性 绑定get set方法
