@@ -286,7 +286,7 @@
       // 解决办法都是去调用 walk 方法 因为 walk 方法内部实现了对不同类型数据的处理 和 触发绑定 get set 方法函数
     ```
 
-### &#x1F4DA; Observer-defineReactive2
+### &#x1F4DA; Compiler
   - 功能
     - 负责模板编译 解析指令/插值表达式
     - 负责页面的渲染
@@ -376,4 +376,16 @@
           return node.nodeType === 1
         }
       }
+    ```
+
+### &#x1F4DA; Dep
+  - 功能
+    - 给每一个响应式数据收集依赖 当数据发生变化的时候调用观察者Watcher的update方法 
+    - 依赖收集 添加观察者Watcher
+    - 通知所有观察者
+  - 结构
+    - ![Image text](../../image/006.jpg)
+    - ![Image text](../../image/007.jpg)
+  - 代码
+    ```js
     ```
