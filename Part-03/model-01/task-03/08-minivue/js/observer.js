@@ -19,8 +19,12 @@ class Observer {
     this.walk(val)
     // 当原本在data属性中是基本类型的数据，后来改变成了复杂数据类型的时候，我们需要把新改变的值也绑定 get 和 set
     let self = this
+    // 收集依赖 并且发送通知
+    let dep = new Dep()
     Object.defineProperty(obj, key, {
       get() {
+        // 收集依赖 target 属性是 Watcher 添加到Dep中的
+        Dep.target && dep.addSub(Dep.target)
         return val
       },
       set(newvalue) {
@@ -30,6 +34,7 @@ class Observer {
         val = newvalue
         self.walk(newvalue)
         // 发送通知
+        dep.notify()
       }
     })
   }

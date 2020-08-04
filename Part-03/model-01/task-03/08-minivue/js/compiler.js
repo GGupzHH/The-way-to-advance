@@ -40,16 +40,29 @@ class Compiler {
     // 通过指令名称调用指定的处理函数
     let updateFn = this[attrName + 'Updater']
     // 判断当前 处理函数 是否存在
-    updateFn && updateFn(node, this.vm[key])
+    updateFn && updateFn.call(this, node, this.vm[key], key)
   }
   // text指令的具体实现 需要改变当前节点的内容
-  textUpdater(node, value) {
+  textUpdater(node, value, key) {
     node.textContent = value
+    // this.vm  这里不能使用this  因为当前函数式直接调用的 所以需要在上面调用的时候改变this 指向
+    // new Watcher(this.vm, key, (newValue) => {
+    new Watcher(this.vm, key, (newValue) => {
+      node.textContent = newValue
+    })
   }
   
   // model指令的具体实现 只需要改变当前input的内容
-  modelUpdater(node, value) {
+  modelUpdater(node, value, key) {
     node.value = value
+    // 同理 这里直接将改变的值渲染到视图中
+    new Watcher(this.vm, key, (newValue) => {
+      node.value = newValue
+    })
+    // 实现 双向数据绑定 将新的值更新到 vm 实例对应的数据中
+    node.addEventListener('input', () => {
+      this.vm[key] = node.value
+    })
   }
 
   // 解析插值表达式
@@ -64,6 +77,10 @@ class Compiler {
       let key = RegExp.$1.trim()
       // 之后使用replace替换节点内容
       node.textContent = value.replace(reg, this.vm[key])
+      // 创建Watcher对象  当数据发生变化的时候更新视图
+      new Watcher(this.vm, key, (newValue) => {
+        node.textContent = newValue
+      })
     }
   }
   // 判断当前的属性是否是一个指令

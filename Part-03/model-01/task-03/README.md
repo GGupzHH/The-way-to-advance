@@ -286,7 +286,7 @@
       // 解决办法都是去调用 walk 方法 因为 walk 方法内部实现了对不同类型数据的处理 和 触发绑定 get set 方法函数
     ```
 
-### &#x1F4DA; Observer-defineReactive2
+### &#x1F4DA; Compiler
   - 功能
     - 负责模板编译 解析指令/插值表达式
     - 负责页面的渲染
@@ -376,4 +376,163 @@
           return node.nodeType === 1
         }
       }
+    ```
+
+### &#x1F4DA; Dep
+  - 功能
+    - 给每一个响应式数据收集依赖 当数据发生变化的时候调用观察者Watcher的update方法 
+    - 依赖收集 添加观察者Watcher
+    - 通知所有观察者
+    - 收集依赖在 observer 挂载的时候收集
+    - 发送通知在 observer 获取数据的时候通知观察者
+  - 结构
+    - ![Image text](../../image/006.jpg)
+    - ![Image text](../../image/007.jpg)
+  - 代码
+    ```js
+      // Dep.js
+      // 在绑定数据的时候收集依赖  在修改数据的时候通知观察者
+      class Dep {
+        constructor() {
+          // 存储所有的观察者
+          this.subs = []
+        }
+        // 添加观察者
+        addSub(sub) {
+          if (sub && sub.update) {
+            this.subs.push(sub)
+          }
+        }
+        // 发送通知
+        notify() {
+          this.subs.forEach(sub => {
+            sub.update()
+          })
+        }
+      }
+      // observer
+      class Observer {
+        constructor(data) {
+          this.walk(data)
+        }
+
+        walk(data) {
+          // 1. 判断data是否为对象
+          if (!data || typeof data !== 'object') {
+            return
+          }
+          // 2. 遍历data对象所有属性 绑定get set方法
+          Object.keys(data).forEach(key => {
+            this.defineReactive(data, key, data[key])
+          })
+        }
+
+        defineReactive(obj, key, val) {
+          // 如果value是对象 此时也会转换为get 和 set
+          this.walk(val)
+          // 当原本在data属性中是基本类型的数据，后来改变成了复杂数据类型的时候，我们需要把新改变的值也绑定 get 和 set
+          let self = this
+          // 收集依赖 并且发送通知
+          let dep = new Dep()
+          Object.defineProperty(obj, key, {
+            get() {
+              // 收集依赖 target 属性是 Watcher 添加到Dep中的
+              Dep.target && dep.addSub(Dep.target)
+              return val
+            },
+            set(newvalue) {
+              if (val === newvalue) {
+                return
+              }
+              val = newvalue
+              self.walk(newvalue)
+              // 发送通知
+              dep.notify()
+            }
+          })
+        }
+      }
+    ```
+
+### &#x1F4DA; Watcher
+  - 功能
+    - 当数据发生变化的时候触发依赖 dep通知所有的Watcher实例更新视图
+    - 自身实例化的时候往Dep 对象中添加自己
+  - 结构
+    - ![Image text](../../image/008.jpg)
+    - ![Image text](../../image/009.jpg)
+      - vm 当前Vue实例
+      - key 当期值在Vue实例中的属性名
+      - cb 处理不同更新方法的回调
+      - oldValue 上次的值
+      - update 更新的方法
+  - 代码
+    ```js
+      class Watcher {
+        constructor(vm, key, cb) {
+          this.vm = vm
+          // data中属性名
+          this.key = key
+          // 回调函数负责处理视图
+          this.cb = cb
+          // 把Watcher对象记录到Dep的静态属性target中
+          Dep.target = this
+          // 在获取上一次的值的时候  就会触发get方法 触发get方法就会触发Dep的addsub方法  这样就将当前对象的Watcher处理函数 push 到 Dep的 subs中了 
+          // 上次的值
+          this.oldValue = vm[key]
+        }
+        // 当数据发生变得时候更新视图
+        update() {
+          let newValue = this.vm[this.key]
+          if (newValue === this.oldValue) {
+            return
+          }
+          this.cb(newValue)
+        }
+      }
+    ```
+
+### &#x1F4DA; 双向绑定
+  - 在处理 v-model 指令的时候 给当前 input 绑定 input 事件 
+  - 事件触发的时候 改变 vm 实例中对应的数据
+    ```js
+      modelUpdater(node, value, key) {
+        node.value = value
+        // 同理 这里直接将改变的值渲染到视图中
+        new Watcher(this.vm, key, (newValue) => {
+          node.value = newValue
+        })
+        // 实现 双向数据绑定 将新的值更新到 vm 实例对应的数据中
+        node.addEventListener('input', () => {
+          this.vm[key] = node.value
+        })
+      }
+    ```
+
+### &#x1F4DA; 整体实现思路
+  1. minivue
+    ```txt
+      从 new Vue 开始 将传入的数据调用 _proxydata 方法 转换成 get 和 set 注入到 Vue 实例中
+      之后调用 observer
+    ```
+  2. Observer
+    ```txt
+      遍历所有的数据
+      使用 defineProperty 监听数据变化 在 获取数据 和 更新数据 的时候做出不同处理
+    ```
+  3. Dep
+    ```txt
+      在 observer 遍历所有数据的时候 给每一个数据都创建 Dep 实例(发布者)
+      绑定的数据的 get 方法收集依赖(addSub)  set 方法去发送通知(notify)
+      发布者拥有 订阅者 addSub 方法 和 订阅者 notify 方法
+    ```
+  4. Watcher
+    ```txt
+      订阅者 依赖收集(addSub)  发布通知(notify)
+      因为每个数据的处理方式不同 所以 订阅者在执行通知函数的时候内部执行传入的 回调函数 达到不同数据不同处理的结果
+    ```
+  5. Compiler
+    ```txt
+      1. 遍历传入的根节点(DOM 树) 将DOM中的值 和 指令 用对应的方法处理
+      2. 当指定的值发生变化的时候 会触发 Observer 的 set 方法(通知) 此方法内部设定了 订阅者(Watcher 通知函数notify notify会将存储的 subs[收集依赖] 依次调用) 函数调用 达到 数据 -> 视图 的效果
     ```
