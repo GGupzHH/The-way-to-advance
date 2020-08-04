@@ -383,9 +383,73 @@
     - 给每一个响应式数据收集依赖 当数据发生变化的时候调用观察者Watcher的update方法 
     - 依赖收集 添加观察者Watcher
     - 通知所有观察者
+    - 收集依赖在 observer 挂载的时候收集
+    - 发送通知在 observer 获取数据的时候通知观察者
   - 结构
     - ![Image text](../../image/006.jpg)
     - ![Image text](../../image/007.jpg)
   - 代码
     ```js
+      // Dep.js
+      // 在绑定数据的时候收集依赖  在修改数据的时候通知观察者
+      class Dep {
+        constructor() {
+          // 存储所有的观察者
+          this.subs = []
+        }
+        // 添加观察者
+        addSub(sub) {
+          if (sub && sub.update) {
+            this.subs.push(sub)
+          }
+        }
+        // 发送通知
+        notify() {
+          this.subs.forEach(sub => {
+            sub.update()
+          })
+        }
+      }
+      // observer
+      class Observer {
+        constructor(data) {
+          this.walk(data)
+        }
+
+        walk(data) {
+          // 1. 判断data是否为对象
+          if (!data || typeof data !== 'object') {
+            return
+          }
+          // 2. 遍历data对象所有属性 绑定get set方法
+          Object.keys(data).forEach(key => {
+            this.defineReactive(data, key, data[key])
+          })
+        }
+
+        defineReactive(obj, key, val) {
+          // 如果value是对象 此时也会转换为get 和 set
+          this.walk(val)
+          // 当原本在data属性中是基本类型的数据，后来改变成了复杂数据类型的时候，我们需要把新改变的值也绑定 get 和 set
+          let self = this
+          // 收集依赖 并且发送通知
+          let dep = new Dep()
+          Object.defineProperty(obj, key, {
+            get() {
+              // 收集依赖 target 属性是 Watcher 添加到Dep中的
+              Dep.target && dep.addSub(Dep.target)
+              return val
+            },
+            set(newvalue) {
+              if (val === newvalue) {
+                return
+              }
+              val = newvalue
+              self.walk(newvalue)
+              // 发送通知
+              dep.notify()
+            }
+          })
+        }
+      }
     ```
