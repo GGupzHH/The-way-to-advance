@@ -55,6 +55,10 @@ class Compiler {
   // model指令的具体实现 只需要改变当前input的内容
   modelUpdater(node, value, key) {
     node.value = value
+    // 同理 这里直接将改变的值渲染到视图中
+    new Watcher(this.vm, key, (newValue) => {
+      node.value = newValue
+    })
   }
 
   // 解析插值表达式
