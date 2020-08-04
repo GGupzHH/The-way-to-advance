@@ -64,6 +64,9 @@ class Compiler {
       let key = RegExp.$1.trim()
       // 之后使用replace替换节点内容
       node.textContent = value.replace(reg, this.vm[key])
+      new Watcher(this.vm, key, (newValue) => {
+        node.textContent = newValue
+      })
     }
   }
   // 判断当前的属性是否是一个指令
