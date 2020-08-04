@@ -59,6 +59,10 @@ class Compiler {
     new Watcher(this.vm, key, (newValue) => {
       node.value = newValue
     })
+    // 实现 双向数据绑定 将新的值更新到 vm 实例对应的数据中
+    node.addEventListener('input', () => {
+      this.vm[key] = node.value
+    })
   }
 
   // 解析插值表达式
