@@ -453,3 +453,19 @@
         }
       }
     ```
+
+### &#x1F4DA; Watcher
+  - 功能
+    - 当数据发生变化的时候触发依赖 dep通知所有的Watcher实例更新视图
+    - 自身实例化的时候往Dep 对象中添加自己
+  - 结构
+    - ![Image text](../../image/008.jpg)
+    - ![Image text](../../image/009.jpg)
+      - vm 当前Vue实例
+      - key 当期值在Vue实例中的属性名
+      - cb 处理不同更新方法的回调
+      - oldValue 上次的值
+      - update 更新的方法
+  - 代码
+    ```js
+    ```
