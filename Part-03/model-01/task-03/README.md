@@ -536,3 +536,20 @@
       1. 遍历传入的根节点(DOM 树) 将DOM中的值 和 指令 用对应的方法处理
       2. 当指定的值发生变化的时候 会触发 Observer 的 set 方法(通知) 此方法内部设定了 订阅者(Watcher 通知函数notify notify会将存储的 subs[收集依赖] 依次调用) 函数调用 达到 数据 -> 视图 的效果
     ```
+
+### &#x1F4DA; 首次渲染
+  - 调试
+    - 通过调试加深对代码的理解
+      - 调试页面首次渲染的过程
+        1.  _proxydata 是将 data 注入到 Vue 实例
+        2. 而 Observer 是将 data 中的所有数据转换为 get set 并且做一些其他的事情
+        3. this.vm[key] 触发的是 _proxydata 中的 get 而 _proxydata 中的 get 方法使用了 data 中的值 获取 data 中的值 就会触发 Observer 的 get 方法
+        4. 依赖收集其实是在每次获取 而在这之前 Watcher 刚被创建 this.vm[key] 的时候去触发了 Observer 的 get 方法 
+
+      - 调试数据改变更新视图的过程
+
+### &#x1F4DA; 问题
+  - 新的数据是否是响应式的
+    - Observer 中 set 方法中实现
+  - 新增的数据是否是响应式的
+  - ![Image text](../../image/010.jpg)
