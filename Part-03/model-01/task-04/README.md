@@ -27,3 +27,9 @@
    - Virtual DOM github的描述
     - 虚拟DOM 可以维护程序的状态 跟踪上一次的状态
     - 通过比较前后两次状态的差异更新真实的DOM
+
+### &#x1F4DA; 虚拟DOM的作用
+  - 维护视图和状态的关系 只记录状态的变化 只更新状态发生变化的位置
+  - 复杂视图情况下提升渲染性能
+  - 除了渲染DOM意外 还可以实现SSR(Nuxt.js/Next.js) 原生应用(Weex /React Native) 小程序(mpvue/uni-app)等
+  - ![Image text](../../image/011.png)
