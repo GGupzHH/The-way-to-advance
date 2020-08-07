@@ -33,3 +33,34 @@
   - 复杂视图情况下提升渲染性能
   - 除了渲染DOM意外 还可以实现SSR(Nuxt.js/Next.js) 原生应用(Weex /React Native) 小程序(mpvue/uni-app)等
   - ![Image text](../../image/011.png)
+  - Virtual-DOM 库
+    - Snabbdom
+      - Vue 2.x 内部使用的 VirtualDOM 就是改造的Snabbdom
+      - 大约 200 SLOC (single line of code)
+      - 通过模块可扩展
+      - 源码使用 TS 开发
+      - 最快的 Virtual DOM 之一
+    - vitual-dom
+
+### &#x1F4DA; 创建项目
+  - 打包工具为了方便使用 parcel
+  - 创建项目 并且安装 parcel
+    - npm init -y
+    - npm install parcel-bundler
+  - 创建启动指令
+    ```json
+      {
+        "scripts": {
+          "serve": "parcel index.html",
+          "build": "parcel build index.html"
+        },
+      }
+    ```
+
+### &#x1F4DA; 导入Snabbdom
+  - Snabbdom 文档
+    - https://github.com/snbbdom/snabbdom
+  - 安装Snabbdom
+    - npm run serve
+  - 导入 Snabbdom
+    
