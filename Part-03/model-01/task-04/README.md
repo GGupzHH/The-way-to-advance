@@ -83,4 +83,51 @@
       ```js
         import {init, h, thunk} from 'snabbdom'
       ```
-      
+
+### &#x1F4DA; Snabbdom 模块
+  - Snabbdom 的核心模块不能处理元素的 属性 / 样式 / 事件 等 如果需要处理可以使用模块
+  - 常用模块
+  - ![Image text](../../image/012.jpg)
+  - 模块使用
+    - 导入需要的模块
+    - init() 中注册模块
+    - 使用h()函数创建VNode的时候 可以把第二个参数设置成对象 其他参数往后移
+  - 代码
+    ```js
+      import { init, h } from 'snabbdom'
+      import style from 'snabbdom/modules/style'
+      import eventlisteners from 'snabbdom/modules/eventlisteners'
+
+      // 创建patch函数  init函数加载模块
+      let patch = init([style, eventlisteners])
+
+      let vnode = h('div', {
+        style: {
+          backgroundColor: 'red'
+        },
+        on: {
+          click: clickHandler
+        }
+      }, [
+        h('h1', 'hello world'),
+        h('p', {
+          style: {
+            fontSize: '14px',
+            color: 'yellow'
+          }
+        }, '我是p标签')
+      ])
+
+      function clickHandler() {
+        console.log('我被点击了')
+      }
+
+      // 获取占位元素
+      let app = document.querySelector('#app')
+
+      // 挂载
+      patch(app, vnode)
+
+    ```
+    
+
