@@ -63,4 +63,71 @@
   - 安装Snabbdom
     - npm run serve
   - 导入 Snabbdom
+    - 以 export 导出
+      ```js
+        import { h, init, thunk } from 'snabbdom'
+      ```
+  - Snabbdom 的核心是提供了 最基本的功能 只导出了三个函数 init() h() thunk()
+    - init() 是一个高阶函数 返回patch()
+    - h() 返回虚拟 DOM 节点 VNode 这个函数我们在使用 Vue 的时候见过
+      ```js
+        new Vue({
+          router,
+          store,
+          render: h=> h(App)
+        }).$mount('#app')
+      ```
+    - thunk() 是一种优化策略 可以在处理不可变的数据的时候使用
+  - npm install snabbdom@0.7.4
+    - 此版本导入方式
+      ```js
+        import {init, h, thunk} from 'snabbdom'
+      ```
+
+### &#x1F4DA; Snabbdom 模块
+  - Snabbdom 的核心模块不能处理元素的 属性 / 样式 / 事件 等 如果需要处理可以使用模块
+  - 常用模块
+  - ![Image text](../../image/012.jpg)
+  - 模块使用
+    - 导入需要的模块
+    - init() 中注册模块
+    - 使用h()函数创建VNode的时候 可以把第二个参数设置成对象 其他参数往后移
+  - 代码
+    ```js
+      import { init, h } from 'snabbdom'
+      import style from 'snabbdom/modules/style'
+      import eventlisteners from 'snabbdom/modules/eventlisteners'
+
+      // 创建patch函数  init函数加载模块
+      let patch = init([style, eventlisteners])
+
+      let vnode = h('div', {
+        style: {
+          backgroundColor: 'red'
+        },
+        on: {
+          click: clickHandler
+        }
+      }, [
+        h('h1', 'hello world'),
+        h('p', {
+          style: {
+            fontSize: '14px',
+            color: 'yellow'
+          }
+        }, '我是p标签')
+      ])
+
+      function clickHandler() {
+        console.log('我被点击了')
+      }
+
+      // 获取占位元素
+      let app = document.querySelector('#app')
+
+      // 挂载
+      patch(app, vnode)
+
+    ```
     
+

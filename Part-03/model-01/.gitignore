@@ -1,3 +1,7 @@
 /means/03-01-study-materials
 
 node_modules
+
+dist
+
+.cache
