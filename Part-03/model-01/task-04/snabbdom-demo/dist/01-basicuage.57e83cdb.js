@@ -771,9 +771,21 @@ function init(modules, domApi) {
 
 var _snabbdom = require("snabbdom");
 
-console.log(_snabbdom.init);
-console.log(_snabbdom.h);
-console.log(_snabbdom.thunk);
+// 1. hello world
+// 参数 数组，模块
+// 返回值 patch 函数 作用对比两个VNode的差异更新到真是的DOM
+var patch = (0, _snabbdom.init)([]); // 第一个参数 标签 + 选择器
+// 第二个参数 如果是字符串就是当前创建的标签的内容
+
+var VNode = (0, _snabbdom.h)('div#content.cls', 'hello world');
+var app = document.querySelector('#app'); // patch 函数主要还是更新DOM
+// 第一个参数可以是DOM 内部会把DOM转换成VNode 第一个参数如果是真实DOM 就会转换成虚拟DOM 然后和第二个参数的虚拟DOM对比 最后更新
+// 第二个参数 VNode
+// 返回值 VNode
+
+var oldVNode = patch(app, VNode);
+VNode = (0, _snabbdom.h)('div', 'hello snabbdom');
+patch(oldVNode, VNode); // 2. div 中插入 h1 p标签
 },{"snabbdom":"node_modules/snabbdom/es/snabbdom.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -802,7 +814,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "11493" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "13125" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
