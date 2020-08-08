@@ -63,4 +63,24 @@
   - 安装Snabbdom
     - npm run serve
   - 导入 Snabbdom
-    
+    - 以 export 导出
+      ```js
+        import { h, init, thunk } from 'snabbdom'
+      ```
+  - Snabbdom 的核心是提供了 最基本的功能 只导出了三个函数 init() h() thunk()
+    - init() 是一个高阶函数 返回patch()
+    - h() 返回虚拟 DOM 节点 VNode 这个函数我们在使用 Vue 的时候见过
+      ```js
+        new Vue({
+          router,
+          store,
+          render: h=> h(App)
+        }).$mount('#app')
+      ```
+    - thunk() 是一种优化策略 可以在处理不可变的数据的时候使用
+  - npm install snabbdom@0.7.4
+    - 此版本导入方式
+      ```js
+        import {init, h, thunk} from 'snabbdom'
+      ```
+      
