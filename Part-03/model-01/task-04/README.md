@@ -127,7 +127,64 @@
 
       // 挂载
       patch(app, vnode)
-
     ```
-    
 
+### &#x1F4DA; Snabbdom 源码解析
+  - 如何学习源码
+    - 先宏观了解
+    - 带着目标去看
+    - 调试
+    - 参考资料
+  - Snabbdom 的核心
+    - 使用 h()函数 创建js对象 (VNode) 描述真实的 DOM
+    - init() 设置模块 创建 patch()
+    - patch() 比较新旧两个VNode
+    - 把变化的内容更新到真实的 DOM 树上
+  
+### &#x1F4DA; Snabbdom h() 函数
+  - vue 中的 h() 实现了组件的机制  而Snabbdom 没有组件的机制
+  - 最早出现于 hyperscript 用来创建 js 的超文本
+  - Snabbdom 的 h() 用来创建 VNode  而不是创建超文本
+  - 函数的重载
+    - 概念
+      - 参数个数或类型不同的函数
+      - js 中没有重载的概念
+      - TS 中有重载 不过重载的实现还是通过代码调整参数
+      - 通过参数的不同去区分不同的函数
+
+    - 代码
+      ```js
+        function add(a, b) {
+          console.log(a, b)
+        }
+
+        function add(a, b, c) {
+          console.log(a, b, c)
+        }
+
+        add(1, 2)
+        add(1, 2, 3)
+      ```
+  - h函数
+    ```txt
+      创建虚拟 DOM 使用函数重载的方式 根据传入参数个数的不同去调用不同的处理函数
+      函数内部判断参数类型 执行不同的操作
+    ```
+
+### &#x1F4DA; Snabbdom VNode
+  - 返回值interface定义 VNode 
+    - ![Image text](../../image/013.jpg)
+  - 函数的参数定义和下面比较 少了一个 key  key是通过data传入的
+    - ![Image text](../../image/014.jpg)
+    
+### &#x1F4DA; Snabbdom VNode 渲染真实 DOM
+  - ![Image text](../../image/015.jpg)
+
+### &#x1F4DA; Snabbdom init函数
+  - ![Image text](../../image/016.jpg)
+    - domApi处理真实DOM
+    - 函数内部设置api变量 
+  - ![Image text](../../image/017.jpg)
+
+### &#x1F4DA; Snabbdom createElement
+  - ![Image text](../../image/018.jpg)
