@@ -65,6 +65,13 @@ class Compiler {
     })
   }
 
+  htmlUpdater(node, value, key) {
+    node.innerHTML = value
+    new Watcher(this.vm, key, (newValue) => {
+      node.innerHTML = newValue
+    })
+  }
+
   // 解析插值表达式
   compilerText(node) {
     // 利用正则匹配插值表达式的内容 通过this.vm 去获取实际数据替换
