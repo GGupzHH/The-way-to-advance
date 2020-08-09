@@ -8,6 +8,8 @@
 </head>
 <body>
   <div id="app">
+    <div v-html="htmlText"></div>
+    <div v-on:click="onclick">点击事件</div>
     <h1>差值表达式</h1>
     <h3>{{ msg }}</h3>
     <h3>{{ count }}</h3>
@@ -28,7 +30,13 @@
       data: {
         msg: 'Hello Vue',
         count: 100,
-        person: { name: 'zs' }
+        person: { name: 'zs' },
+        htmlText: '<p><span>123</span></p>'
+      },
+      methods: {
+        onclick() {
+          console.log('点击事件')
+        }
       }
     })
     console.log(vm.msg)

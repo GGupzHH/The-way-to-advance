@@ -64,6 +64,16 @@ class Compiler {
       this.vm[key] = node.value
     })
   }
+  // v-html 实现
+  htmlUpdater(node, value, key) {
+    node.innerHTML = value
+    new Watcher(this.vm, key, (newValue) => {
+      node.innerHTML = newValue
+    })
+  }
+  onUpdater(node, value, key) {
+    console.log(node, value, key)
+  }
 
   // 解析插值表达式
   compilerText(node) {
