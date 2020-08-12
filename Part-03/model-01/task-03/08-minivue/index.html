@@ -34,7 +34,8 @@
         htmlText: '<p><span>123</span></p>'
       },
       methods: {
-        onclick() {
+        onclick(e) {
+          console.log(e)
           console.log('点击事件')
         }
       }
