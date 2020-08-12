@@ -32,6 +32,9 @@ class Compiler {
         // v-text -> text
         attrName = attrName.substr(2)
         let key = attr.value
+        if (attrName.split(':').length > 1) {
+          this.eventUpdater(node, key, attrName, attrName.split(':')[1])
+        }
         this.update(node, key, attrName)
       }
     })
@@ -71,8 +74,9 @@ class Compiler {
       node.innerHTML = newValue
     })
   }
-  onUpdater(node, value, key) {
-    console.log(node, value, key)
+  // v-on:event 实现
+  eventUpdater(node, value, key, event) {
+    node.addEventListener(event, this.vm.$options.methods[value])
   }
 
   // 解析插值表达式
