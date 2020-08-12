@@ -2,7 +2,7 @@ export default [
   {
     rank: 0,
     title: '电影1',
-    desc: '藐视吗',
+    desc: '描述',
     elmHeight: 10
   }, {
     rank: 1,
