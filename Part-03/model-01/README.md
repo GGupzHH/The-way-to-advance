@@ -1,4 +1,7 @@
 # &#x1F39F; model-01 手写 Vue Router、手写响应式实现、虚拟 DOM 和 Diff 算法
+---
+  具体的笔记都在每一小节的文件下的 README 中
+---
 
 ## &#x1F964; task-01 Vue.js 基础回顾
 
