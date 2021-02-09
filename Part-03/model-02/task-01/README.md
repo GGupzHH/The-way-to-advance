@@ -218,6 +218,7 @@
               }
             }          
           ```
+
         7. 调用 mountComponent 方法 进入 core/instance/lifecycle.js
           ```js
             // 先判断了 当前的选项中是否有reader函数 
@@ -273,7 +274,136 @@
                 // 之后调用 _update 方法  
                 // vm._render() 调用用户传入的reader 或者被编译器生成的reader的  返回 visualDOM
                 // 之后将visualDOM传入 _update 转换成真实DOM 
+                // 但是当前 updateComponent 只是定义 没有执行
                 vm._update(vm._render(), hydrating)
+              }
+            }
+            // 之后调用 Watcher 将 updateComponent 传入 执行
+            new Watcher(vm, updateComponent, noop, {
+              before () {
+                if (vm._isMounted && !vm._isDestroyed) {
+                  callHook(vm, 'beforeUpdate')
+                }
+              }
+            }, true /* isRenderWatcher */)
+            // ...
+            // 最后通过 callHook 触发了 mounted 钩子函数
+            if (vm.$vnode == null) {
+              vm._isMounted = true
+              callHook(vm, 'mounted')
+            }
+          ```
+        8. 接着进入 上面的 Watcher 方法 进入 core/observe/watcher.js
+          ```js
+            // Watcher
+            // 在Vue中有 三中 Watcher
+            // 第一种是 渲染    Watcher
+            // 第二种是 计算属性 Watcher
+            // 第三种是 侦听器   Watcher
+          ```
+          ```js
+            // -----------------------------
+            // 这是在lifecycle调用 lifecycle 调用 Watcher 传入的参数
+              new Watcher(vm, updateComponent, noop, {
+                before () {
+                  if (vm._isMounted && !vm._isDestroyed) {
+                    callHook(vm, 'beforeUpdate')
+                  }
+                }
+              }, true /* isRenderWatcher */)
+            // -----------------------------
+            export default class Watcher {
+              constructor (
+                vm: Component,
+                expOrFn: string | Function,
+                cb: Function,
+                options?: ?Object,
+                isRenderWatcher?: boolean
+              ) {
+                this.vm = vm
+                if (isRenderWatcher) {
+                  vm._watcher = this
+                }
+                vm._watchers.push(this)
+                // options
+                if (options) {
+                  this.deep = !!options.deep
+                  this.user = !!options.user
+                  // 是否延迟执行 当前没有传入  lazy  所以是undefined 
+                  this.lazy = !!options.lazy
+                  this.sync = !!options.sync
+                  this.before = options.before
+                } else {
+                  this.deep = this.user = this.lazy = this.sync = false
+                }
+                this.cb = cb
+                this.id = ++uid // uid for batching
+                this.active = true
+                this.dirty = this.lazy // for lazy watchers
+                this.deps = []
+                this.newDeps = []
+                this.depIds = new Set()
+                this.newDepIds = new Set()
+                this.expression = process.env.NODE_ENV !== 'production'
+                  ? expOrFn.toString()
+                  : ''
+                // parse expression for getter
+                // 也就是传入的 updateComponent
+                if (typeof expOrFn === 'function') {
+                  this.getter = expOrFn
+                } else {
+                  // 当我们创建侦听器的时候会传入字符串 然后会接着处理
+                  this.getter = parsePath(expOrFn)
+                  if (!this.getter) {
+                    this.getter = noop
+                    process.env.NODE_ENV !== 'production' && warn(
+                      `Failed watching path: "${expOrFn}" ` +
+                      'Watcher only accepts simple dot-delimited paths. ' +
+                      'For full control, use a function instead.',
+                      vm
+                    )
+                  }
+                }
+                // 当前 this.lazy = false  所以调用 this.get()
+                this.value = this.lazy
+                  ? undefined
+                  : this.get()
+              }
+
+              /**
+               * Evaluate the getter, and re-collect dependencies.
+              */
+              get () {
+                // 每一个组件对应一个 Watcher
+                // Watcher 会渲染视图
+                // 如果组件有嵌套会先渲染内部的组件
+                // 所以要把父组件的 Watcher 先保存起来
+                pushTarget(this)
+                let value
+                const vm = this.vm
+                try {
+                  // 当前的  getter  也就是上面传入的第二个参数  在这里调用了 updateComponent 并且指向Vue实例
+                  // 而在 updateComponent 中 调用了  
+                  // vm._update()
+                  // 而 _update 将 visualDOM 转换成真实DOM 渲染到界面上
+                  value = this.getter.call(vm, vm)
+                  // 当这里执行完成之后 会回到 lifecycle调用 Watcher的地方继续执行 从而触发钩子函数 mounted
+                } catch (e) {
+                  if (this.user) {
+                    handleError(e, vm, `getter for watcher "${this.expression}"`)
+                  } else {
+                    throw e
+                  }
+                } finally {
+                  // "touch" every property so they are all tracked as
+                  // dependencies for deep watching
+                  if (this.deep) {
+                    traverse(value)
+                  }
+                  popTarget()
+                  this.cleanupDeps()
+                }
+                return value
               }
             }
           ```
