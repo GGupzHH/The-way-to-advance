@@ -213,6 +213,7 @@
               }
             }
           }
+          return mount.call(this, el, hydrating)
           // 最后调用mount 方法  中又调用了 mountComponent 这里就是和环境无关的代码了
         ```
         getOuterHTML 的实现
