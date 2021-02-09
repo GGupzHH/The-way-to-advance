@@ -14,7 +14,7 @@
     - sfc           .vue 文件编译为 js 对象
     - shared        公共的代码
 
-### &#x1F4DA; 2. 准备工作-调试
+### &#x1F4DA; 3. 准备工作-调试
   - 打包工具
     - Rollup
       - Vue.js 源码的打包工具使用的是 Rollup，比 Webpack 轻量
@@ -38,7 +38,7 @@
     - examples 的示例中引入的 vue.min.js 改为 vue.js
     - 打开 Chrome 的调试工具中的 source
 
-### &#x1F4DA; 2. 准备工作-Vue的不同构建版本
+### &#x1F4DA; 4. 准备工作-Vue的不同构建版本
   - dist\README.md
   - ![Image text](../../image/019.jpg)
   - 术语
@@ -81,3 +81,49 @@
   - 获取Vue-cli 中 webpack 完整的配置
     - 在当前目录输入 vue inspect > output.js
     - 或者 vue ui 可以看到webpack的完整的配置
+
+### &#x1F4DA; 5. Vue 首次渲染的过程
+  - 首先进入的是`core/instance/index.js`
+    - 定义了`Vue的构造函数` 在构造函数中调用了 `_init()` 方法
+      - `init`方法
+        1. 先是给Vue实例做了`标记`
+          ```js
+            // 当前标记是在observe(响应式处理)的时候 判断当前是不是Vue实例  如果是Vue实例 则不需要响应式处理
+            vm._isVue = ture
+          ```
+        2. 判断当前Vue实例是不是组件 来合并 `options` 选项
+          ```js
+            if (options && options._isComponent) {
+              // 如果是组件 则通过下面合并options选项
+              initInternalComponent(vm, options)
+            } else {
+              // 如果不是组件 也就是当前是创建Vue实例 使用下面的方法合并options
+              vm.$options = mergeOptions(
+                // 和Vue构造函数中的options进行合并
+                resolveConstructorOptions(vm.constructor),
+                options || {},
+                vm
+              )
+            }
+          ```
+        3. 判断当前的环境----如果是开发环境
+          ```js
+            initProxy(vm)
+            // initProxy 实现
+            // 先判断当前浏览器环境是否支持proxy对象
+            // 支持   就创建一个Proxy实例 代理Vue实例
+            // 不支持 直接把Vue实例设置给_readerProxy  vm._readerProxy = vm
+            
+          ```
+        4. 判断当前的环境----如果是生产环境
+          ```js
+            vm._readerProxy = vm
+          ```
+
+  - 然后进入的是`core/index.js`
+    - 之后调用了`initGlobalAPI()`方法 初始化了Vue的静态成员 
+  - 之后进入的是`web/runtime/index.js`
+    - 在这个文件中初始化了一些和平台相关的内容
+    - 最后还挂载了 `__patch` 和 `$mount` 两个方法
+  - 第四个文件是入口`web/entry-runtime-with-compiler.js`
+    - 在这个文件中重写了`$mount`增加了编译功能 也就是把模板编译成reader函数
