@@ -119,6 +119,164 @@
           ```js
             vm._readerProxy = vm
           ```
+        5. 初始化一些内容
+          ```js
+            // expose real self
+            vm._self = vm
+            // 初始化函数 给 Vue实例成员初始化
+            // 初始化生命周期相关的钩子函数
+            initLifecycle(vm)
+            // 初始化一些事件
+            initEvents(vm)
+            // 初始化render函数
+            // $slots  $scopedSlots  _c  $createElement  $attrs  $listeners
+            initRender(vm)
+            // 触发生命周期函数  beforeCreate
+            callHook(vm, 'beforeCreate')
+            // 实现依赖注入 inject
+            initInjections(vm) // resolve injections before data/props
+
+            // 初始化了 props methods data computed watch
+            // 并将对应属性设置成响应式挂载到 vm 实例
+            initState(vm)
+
+            // 实现依赖注入 provide
+            initProvide(vm) // resolve provide after data/props
+            // 触发生命周期函数  beforeCreate
+            callHook(vm, 'created')
+          ```
+        6. 调用 $mount方法 进入 entry-runtime-with-compiler.js
+          ```js
+            // 把模板转换成render函数
+            if (!options.render) {
+              // 如果没有render函数就把模板编译成render函数
+              let template = options.template
+              // 如果模板存在
+              if (template) {
+                // 且模板是字符串
+                if (typeof template === 'string') {
+                  // 如果模板是ID选择器
+                  if (template.charAt(0) === '#') {、
+                    // 获取对应DOM的innerHTML
+                    template = idToTemplate(template)
+                    /* istanbul ignore if */
+                    if (process.env.NODE_ENV !== 'production' && !template) {
+                      warn(
+                        `Template element not found or is empty: ${options.template}`,
+                        this
+                      )
+                    }
+                  }
+                } else if (template.nodeType) {
+                  // 如果模板是元素 则获取当前模板的元素的innerHTML
+                  template = template.innerHTML
+                } else {
+                  if (process.env.NODE_ENV !== 'production') {
+                    warn('invalid template option:' + template, this)
+                  }
+                  return this
+                }
+              } else if (el) {
+                template = getOuterHTML(el)
+              }
+              // 接下来判断是否有 template 如果有就调用 compileToFunctions 把模板转换成reader函数
+              if (template) {
+                /* istanbul ignore if */
+                if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
+                  mark('compile')
+                }
+                // staticRenderFns 优化的一个方法
+                const { render, staticRenderFns } = compileToFunctions(template, {
+                  outputSourceRange: process.env.NODE_ENV !== 'production',
+                  shouldDecodeNewlines,
+                  shouldDecodeNewlinesForHref,
+                  delimiters: options.delimiters,
+                  comments: options.comments
+                }, this)
+                // reader 函数生成以后 存储到 options 中
+                options.render = render
+                options.staticRenderFns = staticRenderFns
+
+                /* istanbul ignore if */
+                if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
+                  mark('compile end')
+                  measure(`vue ${this._name} compile`, 'compile', 'compile end')
+                }
+              }
+            }
+            // 最后调用mount 方法  中又调用了 mountComponent 这里就是和环境无关的代码了
+          ```
+          getOuterHTML 的实现
+          ```js
+            function getOuterHTML (el: Element): string {
+              if (el.outerHTML) {
+                return el.outerHTML
+              } else {
+                const container = document.createElement('div')
+                container.appendChild(el.cloneNode(true))
+                return container.innerHTML
+              }
+            }          
+          ```
+        7. 调用 mountComponent 方法 进入 core/instance/lifecycle.js
+          ```js
+            // 先判断了 当前的选项中是否有reader函数 
+            // 判断当前是否是运行时环境  并且传入了模板
+            // 但是此时如果是开发环境的话 会发送一个警告 当前使用的是运行时版本 编译器是无效的
+            // 如果我们没有传入reader 编译器会把模板编译成reader函数
+            if (!vm.$options.render) {
+              vm.$options.render = createEmptyVNode
+              if (process.env.NODE_ENV !== 'production') {
+                /* istanbul ignore if */
+                if ((vm.$options.template && vm.$options.template.charAt(0) !== '#') ||
+                  vm.$options.el || el) {
+                  warn(
+                    'You are using the runtime-only build of Vue where the template ' +
+                    'compiler is not available. Either pre-compile the templates into ' +
+                    'render functions, or use the compiler-included build.',
+                    vm
+                  )
+                } else {
+                  warn(
+                    'Failed to mount component: template or render function not defined.',
+                    vm
+                  )
+                }
+              }
+            }
+            // 之后触发了生命周期的钩子函数  beforeMount
+            callHook(vm, 'beforeMount')
+
+            // 更新组件  挂载
+            let updateComponent
+            /* istanbul ignore if */
+            if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
+              updateComponent = () => {
+                // 下面如果是开发环境 并且启动了性能检测 下面是性能检测有关的代码
+                const name = vm._name
+                const id = vm._uid
+                const startTag = `vue-perf-start:${id}`
+                const endTag = `vue-perf-end:${id}`
+
+                mark(startTag)
+                const vnode = vm._render()
+                mark(endTag)
+                measure(`vue ${name} render`, startTag, endTag)
+
+                mark(startTag)
+                vm._update(vnode, hydrating)
+                mark(endTag)
+                measure(`vue ${name} patch`, startTag, endTag)
+              }
+            } else {
+              updateComponent = () => {
+                // 之后调用 _update 方法  
+                // vm._render() 调用用户传入的reader 或者被编译器生成的reader的  返回 visualDOM
+                // 之后将visualDOM传入 _update 转换成真实DOM 
+                vm._update(vm._render(), hydrating)
+              }
+            }
+          ```
 
   - 然后进入的是`core/index.js`
     - 之后调用了`initGlobalAPI()`方法 初始化了Vue的静态成员 
