@@ -468,7 +468,7 @@
       - 如果是则赋值给 `this.getter = expOrFn`
     - 之后调用静态方法 `get`
     - get()
-      - 调用 `this.getter.call(vm, vm)` 并用 `teyCatch` 包裹 因为是用户传入的
+      - 调用 `this.getter.call(vm, vm)` 并用 `tryCatch` 包裹 因为是用户传入的
       - `this.getter` 也就是 `updateComponent` 
       - 调用 `vm._update(vm._render(), hydrating)`
         - `vm._render()`
