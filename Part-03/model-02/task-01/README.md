@@ -155,6 +155,9 @@
           callHook(vm, 'created')
         ```
       6. 调用 $mount方法 进入 entry-runtime-with-compiler.js
+        - (重写了`mount`方法)[https://github.com/GGupzHH/vue/blob/dev/src/platforms/web/entry-runtime-with-compiler.js]
+
+        - 实现
         ```js
           // 把模板转换成render函数
           if (!options.render) {
@@ -417,3 +420,61 @@
             }
           }
         ```
+
+
+### &#x1F4DA; 5. Vue 首次渲染的过程-总结
+  - [`Vue` 初始化](https://github.com/GGupzHH/vue/blob/dev/src/core/instance/index.js)
+    - 实例成员
+    - 静态成员
+
+  - [`new Vue()`](https://github.com/GGupzHH/vue/blob/dev/src/core/instance/index.js)
+    - 调用`Vue`构造函数
+
+  - [`Vue`构造函数 中调用`this._init(options)`](https://github.com/GGupzHH/vue/blob/dev/src/core/instance/index.js)
+    - 将用户传入的 `options` 传入
+    - [合并用户传入的`options`](https://github.com/GGupzHH/vue/blob/dev/src/core/instance/init.js)
+
+  - [`vm.$mount()`](https://github.com/GGupzHH/vue/blob/dev/src/platforms/web/entry-runtime-with-compiler.js)
+    - 帮我们把模板编译成函数
+    - 先判断是否传入了`render` 
+      - 没有传入 获取 `Template` 选项
+      - 如果 `Template` 也没有传入 则会把 `el` 作为模板
+    - 接着用 `compileToFunctions` 生成 `render` 渲染函数
+    - 并将 `options.render = render`
+    - 最后调用 mount
+
+  - [重写 vm.$mount()](https://github.com/GGupzHH/vue/blob/dev/src/platforms/web/runtime/index.js)
+    - 重新获取`el` 因为运行时版本是不会执行这个入口的
+    - 接着调用 `mountComponent(this, el, hydrating)`
+
+  - [mountComponent(this, el)](https://github.com/GGupzHH/vue/blob/dev/src/core/instance/lifecycle.js)
+    - 判断 `options.render` 是否存在
+      - 如果没有但是传入了模板 并且是开发环境的时候会发送警告⚠️
+    - 触发钩子函数 beforeMount `callHook(vm, 'beforeMount')`
+    - 定义 `updateComponent` `let updateComponent`
+    - `updateComponent`赋值并没有调用
+      - `vm._update(vm._render(), hydrating)`
+      - `vm._render()` 调用用户传入的reader 或者被编译器生成的reader的  返回 visualDOM
+      - `vm._update` 将visualDOM传入 _update 转换成真实DOM
+    - 创建 `Watcher` 实例 将 `updateComponent` 作为第二个参数传入
+    - 最后触发钩子函数 mounted `callHook(vm, 'mounted')`
+    - 并返回 vm
+
+  - [watcher](https://github.com/GGupzHH/vue/blob/dev/src/core/observer/watcher.js)
+    - 用 `expOrFn` 接收传入的 `updateComponent`
+    - 获取当前 `options` 中的 `lazy` 字段
+      - `lazy` 是否延迟执行
+    - 判断 `expOrFn` 是否是函数
+      - 如果是则赋值给 `this.getter = expOrFn`
+    - 之后调用静态方法 `get`
+    - get()
+      - 调用 `this.getter.call(vm, vm)` 并用 `teyCatch` 包裹 因为是用户传入的
+      - `this.getter` 也就是 `updateComponent` 
+      - 调用 `vm._update(vm._render(), hydrating)`
+        - `vm._render()`
+          - 调用实例化时 `Vue` 传入的 `render()`
+          - 或者编译 `template` 生成的 `render()`
+          - 返回 `VNode`
+        - `vm._update()`
+          - 调用 `vm.__patch__(vm.$el, vnode)` 挂载真实DOM
+          - 记录 `vm.$el`
