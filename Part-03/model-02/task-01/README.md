@@ -422,7 +422,7 @@
         ```
 
 
-### &#x1F4DA; 5. Vue 首次渲染的过程-总结
+### &#x1F4DA; 6. Vue 首次渲染的过程-总结
   - [`Vue` 初始化](https://github.com/GGupzHH/vue/blob/dev/src/core/instance/index.js)
     - 实例成员
     - 静态成员
@@ -478,3 +478,12 @@
         - `vm._update()`
           - 调用 `vm.__patch__(vm.$el, vnode)` 挂载真实DOM
           - 记录 `vm.$el`
+
+### &#x1F4DA; 7. Vue 响应式原理入口
+  - [在`_init`中调用了`initState`](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/instance/init.js#L71:5)
+  - [observer 就是响应式处理的入口](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/instance/state.js#L63)
+  - [判断是否传入`data`选项](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/instance/state.js#L58)
+    - 传入则使用`initData`遍历 并且判断`data`中的属性`key`是否有和`methods` `props` 重名的 重名则在开发环境警告提示
+      - [initData](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/instance/state.js#L126)
+      - [`initData` 中最后调用 `observe`设置成响应式](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/instance/state.js#L174:17)
+    - [如果没传入则直接调用`observe`设置成响应式](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/instance/state.js#L63:47)
