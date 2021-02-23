@@ -422,7 +422,7 @@
         ```
 
 
-### &#x1F4DA; 5. Vue 首次渲染的过程-总结
+### &#x1F4DA; 6. Vue 首次渲染的过程-总结
   - [`Vue` 初始化](https://github.com/GGupzHH/vue/blob/dev/src/core/instance/index.js)
     - 实例成员
     - 静态成员
@@ -478,3 +478,54 @@
         - `vm._update()`
           - 调用 `vm.__patch__(vm.$el, vnode)` 挂载真实DOM
           - 记录 `vm.$el`
+
+### &#x1F4DA; 7. Vue 响应式原理入口
+  - [在`_init`中调用了`initState`](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/instance/init.js#L71:5)
+  - [observer 就是响应式处理的入口](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/instance/state.js#L63)
+  - [判断是否传入`data`选项](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/instance/state.js#L58)
+    - 传入则使用`initData`遍历 并且判断`data`中的属性`key`是否有和`methods` `props` 重名的 重名则在开发环境警告提示
+      - [initData](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/instance/state.js#L126)
+      - [`initData` 中最后调用 `observe`设置成响应式](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/instance/state.js#L174:17)
+    - [如果没传入则直接调用`observe`设置成响应式](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/instance/state.js#L63:47)
+  - [`observe(data, true)` 第一个参数是data的数据 第二个参数是是否是根数据 需要做特殊处理](https://ssourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/instance/state.js#L174)
+  - [`observe`如果已经有observe直接返回](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L109)
+    - [如果有直接返回 通过`__ob__`判断](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L115:14)
+    - [如果没有则判断当前`value`是否是数组或者纯粹的对象并且不是`Vue`实例(_isVue)](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L120)
+      - [创建`observe`对象 转换成`setter` `getter`](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L124)
+    - [最后返回`ob`](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L129)
+
+### &#x1F4DA; 8. Vue 响应式原理-Observer
+  - getter setter 收集依赖 派发更新
+  - [设置`__ob__`用来判断是否已经做过响应式处理](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L46)
+  - [判断是数组](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L47)
+  - [判断是对象](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L55)
+    - [`walk`实现](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L64)
+      - 遍历对象使用`defineReactive`将每一项转换成 getter setter
+  - [`defineReactive`](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L135)
+    - 为一个对象定义响应式的属性
+    - 参数
+       - shallow 是否深度监听
+    - 实现
+      - [创建dep对象 收集依赖](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L142:23)
+      - [判断当前对象是否是可配置的(可配置setter getter) 如果不可配置直接返回](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L145)
+      - [判断用户传入的数据是否已经设置了额 setter getter 如果设置了则保留](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L150)
+      - [接着判断当前传入的参数是否只有两个 则给val形参赋值](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L152)
+      - [之后使用Object.defineProperty给当前属性设置setter getter](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L157)
+        - [设置当前属性可配置 可枚举](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L159)
+        - [get](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L160)
+          - [先判断当前用户是否已经给该属性设置了 getter](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L161) 
+            - [如果设置了则调用 并且把用户设置的 getter 的返回值返回](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L161)
+            - [如果没设置 则获取当前 属性对应的值返回](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L161)
+          - [收集依赖](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L162)
+        - [set](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L173)
+          - [先使用 getter 获取旧值 如果用户传入了getter 则使用用户getter返回的值](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L174)
+          - [接着判断当前设置的值是否和原值相等 相等则直接停止继续执行](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L176)
+            - [这里还判断了NaN](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L176)
+          - [判断如果getter 存在 setter不存在 则该属性是只读的 停止执行](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L184)
+          - [判断当前用户是否已经给该属性设置了 setter](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L186)
+            - [如果设置了则调用 并且把用户设置的 setter 的返回值返回](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L186)
+            - [如果没设置 则把新值直接赋值给旧值](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L188)
+          - [如果当前新值是对象 则使用 observe 再转换成 getter setter](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L190) 
+          - [派发更新](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L191)
+          
+   
