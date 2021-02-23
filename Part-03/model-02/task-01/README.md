@@ -501,6 +501,8 @@
   - [判断是对象](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L55)
     - [`walk`实现](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L64)
       - 遍历对象使用`defineReactive`将每一项转换成 getter setter
+
+### &#x1F4DA; 8. Vue 响应式原理-defineReactive
   - [`defineReactive`](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L135)
     - 为一个对象定义响应式的属性
     - 参数
@@ -526,6 +528,22 @@
             - [如果设置了则调用 并且把用户设置的 setter 的返回值返回](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L186)
             - [如果没设置 则把新值直接赋值给旧值](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L188)
           - [如果当前新值是对象 则使用 observe 再转换成 getter setter](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L190) 
-          - [派发更新](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L191)
-          
-   
+          - [派发更新](https://sourcegraph.com/github.com/GGupzHH/vdue/-/blob/src/core/observer/index.js#L191)
+
+### &#x1F4DA; 8. Vue 响应式原理-依赖收集
+  - [判断 `Dep.target` 是否存在 ](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L172)
+  - `Dep.target` 的赋值
+    - 传入 `Watcher` 的就是 `updateComponent` 而 `updateComponent` 就是将 `visualDOM` 转换成真实 `DOM` 的
+    - [在 `new Watcher` 中调用了 `Watcher` 的 `get` 方法](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/watcher.js#L95)
+    - [`get` 方法中调用了 `pushTarget`](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/watcher.js#L103)
+    - [`pushTarget` 中给 `Dep.target` 将当前的 `Watcher` 赋值](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/dep.js#L61)
+  - [然后调用 `dep.depend()` 实现](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L176:20)
+    - [Dep.target.addDep(this)](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/dep.js#L31)
+  - [`addDep` 实现](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/watcher.js#L129)
+    - [获取当前 `dep id` 判断当前 `id` 是否存在于一个集合中](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/watcher.js#L133)
+    - [将集合不存的 `id` 保存 并且调用 `addSub` 将当前 `Watcher` 传入](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/watcher.js#L137)
+    - 这样如果有重复的就不会重复添加
+  - [`addSub` 实现](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/dep.js#L23)
+    - [将传入的 `Watcher` `push` 到 `subs` 数组](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/dep.js#L23)
+
+      
