@@ -48,7 +48,23 @@ Vue.js 源码剖析-响应式原理、虚拟 DOM、模板编译和组件化
 
 
 2、请简述 Vue 响应式原理。
-
+  - 在init中调用了initstate
+    - initstate中判断当前是否传入data 如果传入data则调用initdata 如果没传入则给_data负值成空对象并且绑定响应式
+  - 这里面接着调用了initdata这个方法
+    - initdata中判断当前传入的data是否和methods props中有重名 没有则调用observe
+    - 没有则调用observe 做响应式处理
+  - observe中判断当前直是否是对象
+    - 判断当前对象是否存在 __ob__ 属性 如果有则说明已经做过响应式处理
+    - 判断是否是Vue实例 如果是则直接返回不做处理
+    - 如果没有 创建 Observer 对象
+    - 返回 observer对象
+  - Observer
+    - 创建dep对象 并且判断当前value是对象还是数组 分别做不同的处理
+      - 数组
+        - 先 判断当前浏览器是否存在__proto__
+        - 然后创建一个空对象 在空对象内部将push pop shift unshift 等一些数组方法的名字定义好 然后将数组的原型对象指向当前这个新创建的对象 并且做响应式处理
+      - 对象 对象则直接调用walk方法遍历value 依次调用defineReactive
+    - 通过def函数给当前value挂载__ob__属性 并且设置成不可枚举
 3、请简述虚拟 DOM 中 Key 的作用和好处。
 
 4、请简述 Vue 中模板编译的过程。
