@@ -498,6 +498,24 @@
   - getter setter 收集依赖 派发更新
   - [设置`__ob__`用来判断是否已经做过响应式处理](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L46)
   - [判断是数组](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L47)
+    - [先判断当前运行环境是否支持原型属性](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L52)
+      - [hasProto](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L50)
+        - [支持](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L56)
+          1. 将当前 value 的构造函数的原型(Array) 原型设置成 arrayMethods
+          2. arrayMethods内部实现了 "劫持" 的功能  将Array的实例方法劫持 使得能够知道数组什么时候变化
+          3. 具体实现
+              - 创建一个新对象arrayMethods 新对象指向 Array
+              - 将能改变数组内容的方法名字汇总 methodsToPatch
+              - 遍历汇总好的方法名数组 methodsToPatch.forEach
+              - 监听新对象的里面的每一个属性（这些属性就是methodsToPatch 里面的方法名）
+              - 监听的回调中调用 真正的 Array.prototype对象方法
+              - 如果当前新增了 那么调用 observeArray 重新遍历新数组绑定observer
+              - 最后派发更新
+        - [不支持](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L58)
+          ```txt
+            
+          ```
+      - [最后遍历数组的每一项  给数组中的每一项创建observer实例](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L61)
   - [判断是对象](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L55)
     - [`walk`实现](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/index.js#L64)
       - 遍历对象使用`defineReactive`将每一项转换成 getter setter
@@ -545,5 +563,3 @@
     - 这样如果有重复的就不会重复添加
   - [`addSub` 实现](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/dep.js#L23)
     - [将传入的 `Watcher` `push` 到 `subs` 数组](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/core/observer/dep.js#L23)
-
-      
