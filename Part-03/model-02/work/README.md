@@ -122,7 +122,7 @@ Vue.js 源码剖析-响应式原理、虚拟 DOM、模板编译和组件化
       - patch 的过程中跳过静态根节点
     - generate 将优化过的AST转换成字符串形式的js代码
   - 然后回到 compileToFunctions 
-    - 将上一步生成的字符串形式js代码转换为函数
-    - 调用createFunction
+    - 调用compile
+    - 将上一步生成的字符串形式js代码转换为函数 调用createFunction
     - render 和 staticRenderFns初始化完毕 挂载到Vue实例的options对应的属性上
   - 模板中不要写无意义的空白和换行  会生成很多余的代码
