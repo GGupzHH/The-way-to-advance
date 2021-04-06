@@ -1,8 +1,13 @@
-## &#x1F964; task-01 Vue.js 源码剖析-虚拟 DOM
+## &#x1F964; task-02 Vue.js 源码剖析-虚拟 DOM
 
-### &#x1F4DA; 1. 阶段内容
-  - 快速回顾vue的基础语法-官方文档的核心内容
-  - VueRouter的原理分析  并且自己实现一个 
-  - 虚拟DOM 库Snabbdom 源码分析
-  - 响应式原理分析与实现
-  - vue源码分析
+### &#x1F4DA; 1. 虚拟DOM
+
+### &#x1F4DA; 2. createElement
+
+### &#x1F4DA; 3. patch
+
+### &#x1F4DA; 4. patchVnode
+
+### &#x1F4DA; 5. patchVnode
+
+### &#x1F4DA; 6. updateChildren
