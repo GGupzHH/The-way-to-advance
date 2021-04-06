@@ -1,4 +1,4 @@
-## &#x1F964; task-01 Vue.js 源码剖析-模板编译和组件化
+## &#x1F964; task-03 Vue.js 源码剖析-模板编译和组件化
 
 ### &#x1F4DA; 1. 模板编译过程
   - [入口 `compileToFunctions`](https://sourcegraph.com/github.com/GGupzHH/vue/-/blob/src/platforms/web/compiler/index.js)
